@@ -1,0 +1,44 @@
+version: "3.9"
+
+networks:
+  redenet:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/24
+
+services:
+  server:
+    build: .
+    container_name: redes_server
+    hostname: server
+    networks:
+      redenet:
+        ipv4_address: 172.28.0.10
+    volumes:
+      - logs_vol:/logs
+      - received_vol:/received
+    command: ["sleep", "infinity"]
+    cap_add:
+      - NET_ADMIN
+    privileged: true
+
+  client:
+    build: .
+    container_name: redes_client
+    hostname: client
+    networks:
+      redenet:
+        ipv4_address: 172.28.0.20
+    volumes:
+      - logs_vol:/logs
+    command: ["sleep", "infinity"]
+    cap_add:
+      - NET_ADMIN
+    privileged: true
+    depends_on:
+      - server
+
+volumes:
+  logs_vol:
+  received_vol:
