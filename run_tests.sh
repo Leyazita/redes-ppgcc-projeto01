@@ -1,3 +1,6 @@
+#!/bin/bash
+# run_tests.sh — Fase 1 | PPGCC/UFPI 2026-1
+
 set -e
 
 SCENARIOS=("A" "B" "C")
@@ -39,11 +42,23 @@ for SCENARIO in "${SCENARIOS[@]}"; do
         echo ""
         echo "--- Protocolo: $PROTO_UP | Cenário: $SCENARIO ---"
 
-        docker exec -d $SERVER python3 /app/server.py --mode $PROTO --port $PORT
-        sleep 2
+        # Garante que não há servidor anterior rodando
+        docker exec $SERVER bash -c "pkill -f 'server.py' 2>/dev/null; sleep 1; true"
 
-        docker exec -d $SERVER tcpdump -i eth0 port $PORT -w $PCAP 2>/dev/null
-        sleep 0.5
+        # Sobe servidor em background via nohup para persistir
+        docker exec -d $SERVER bash -c "nohup python3 /app/server.py --mode $PROTO --port $PORT > /logs/server_${PROTO}_${SCENARIO}.log 2>&1"
+        sleep 3
+
+        # Verifica se servidor subiu
+        if ! docker exec $SERVER bash -c "pgrep -f 'server.py' > /dev/null 2>&1"; then
+            echo "  [ERRO] Servidor não iniciou! Log:"
+            docker exec $SERVER cat /logs/server_${PROTO}_${SCENARIO}.log 2>/dev/null || true
+            continue
+        fi
+
+        # Inicia tcpdump
+        docker exec -d $SERVER bash -c "nohup tcpdump -i eth0 port $PORT -w $PCAP 2>/dev/null &"
+        sleep 1
 
         echo "  Executando $RUNS transferências..."
         docker exec $CLIENT python3 /app/client.py \
@@ -54,9 +69,11 @@ for SCENARIO in "${SCENARIOS[@]}"; do
             --runs $RUNS \
             --out $OUT
 
-        docker exec $SERVER bash -c "pkill -f 'server.py' 2>/dev/null; pkill -f tcpdump 2>/dev/null; true"
-        sleep 1
+        # Para servidor e tcpdump
+        docker exec $SERVER bash -c "pkill -f tcpdump 2>/dev/null; pkill -f server.py 2>/dev/null; true"
+        sleep 2
 
+        # Converte pcap para CSV
         docker exec $SERVER bash -c \
             "tcpdump -r $PCAP -l -n 2>/dev/null | awk '{print NR\",\"\$0}' > $CSV" || true
 
