@@ -20,7 +20,7 @@ FLAG_ACK    = 0x02
 FLAG_SYN    = 0x04
 FLAG_FIN    = 0x08
 
-WINDOW_SIZE = 32
+WINDOW_SIZE = 16
 # Timeout base — o cliente ajusta dinamicamente com base no RTT medido
 TIMEOUT_BASE = 0.5
 
@@ -226,8 +226,9 @@ class RUDPClient:
                     break  # tudo confirmado
 
                 # Envia pacotes que cabem na janela
-                sent_something = False
                 with lock:
+                    sent_something = False
+                    window_full    = (next_seq[0] >= base[0] + WINDOW_SIZE)
                     while next_seq[0] < min(base[0] + WINDOW_SIZE, total):
                         seq_to_send = next_seq[0]
                         pkt = make_packet(seq_to_send, 0, FLAG_DATA, chunks[seq_to_send])
@@ -235,16 +236,19 @@ class RUDPClient:
                         send_times[seq_to_send] = time.perf_counter()
                         next_seq[0] += 1
                         sent_something = True
-                    last_send_time_snap = last_send_time
                     b_snap  = base[0]
                     ns_snap = next_seq[0]
 
+                # Atualiza last_send_time quando enviou algo novo.
+                # Se a janela estava cheia (esperando ACKs), NÃO reseta o timer —
+                # assim o timeout dispara corretamente se os ACKs não chegarem.
                 if sent_something:
                     last_send_time = time.perf_counter()
 
-                # Verifica timeout: se a janela não avançou por muito tempo
+                # Verifica timeout: base não avançou por 2×RTT após o último envio
                 timeout = max(2.0 * rtt_avg[0], 0.3)
-                if (time.perf_counter() - last_send_time) > timeout and b_snap < total:
+                now = time.perf_counter()
+                if (now - last_send_time) > timeout:
                     with lock:
                         if base[0] == b_snap and next_seq[0] > base[0]:
                             log.debug(f"[R-UDP/GBN] Timeout base={base[0]}, "
@@ -253,8 +257,10 @@ class RUDPClient:
                             retrans[0]  += (next_seq[0] - base[0])
                             next_seq[0]  = base[0]
                     last_send_time = time.perf_counter()
+                elif window_full:
+                    # Janela cheia mas sem timeout — aguarda ACKs sem busy-wait
+                    time.sleep(0.002)
                 else:
-                    # Cede CPU sem busy-wait agressivo
                     time.sleep(0.001)
 
             done[0] = True
