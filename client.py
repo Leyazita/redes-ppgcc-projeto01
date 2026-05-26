@@ -77,7 +77,14 @@ class TCPClient:
 
             elapsed = time.perf_counter() - start
             throughput = sent / elapsed if elapsed > 0 else 0
-            s.recv(512)
+
+            # Aguarda confirmação do servidor com timeout curto.
+            # Não bloqueia a medição — o tempo já foi registrado acima.
+            try:
+                s.settimeout(5.0)
+                s.recv(512)
+            except socket.timeout:
+                pass  # servidor demorou, mas a transferência já foi medida
 
         log.info(f"[TCP] Enviado: {sent} bytes em {elapsed:.3f}s — {throughput/1024:.1f} KB/s")
         return {"protocol": "TCP", "filename": filename, "bytes_sent": sent,
