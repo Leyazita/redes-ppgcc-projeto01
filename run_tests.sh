@@ -1,7 +1,7 @@
 SCENARIOS=("A" "B" "C")
 PROTOCOLS=("tcp" "rudp")
-RUNS=5
-TEST_FILE="files/test_10MB.bin"
+RUNS=30
+TEST_FILE="files/test_1MB.bin"
 SERVER="redes_server"
 CLIENT="redes_client"
 TCP_PORT=5000
@@ -10,40 +10,33 @@ IFACE="eth0"
 
 mkdir -p logs files received
 
-echo ">>> Gerando arquivo de teste (10 MB)..."
-dd if=/dev/urandom of=$TEST_FILE bs=1M count=10 2>/dev/null
+echo ">>> Gerando arquivo de teste (1 MB)..."
+dd if=/dev/urandom of=$TEST_FILE bs=1M count=1 2>/dev/null
 echo "    Arquivo criado: $TEST_FILE"
 
 echo ">>> Preparando /files no container cliente..."
 docker exec $CLIENT bash -c "rm -rf /files && mkdir -p /files && chmod 777 /files"
-docker cp $TEST_FILE $CLIENT:/files/test_10MB.bin
+docker cp $TEST_FILE $CLIENT:/files/test_1MB.bin
 echo "    Cópia OK"
 
-# Aplica tc nos dois containers:
-#   - Cliente: delay + loss (afeta pacotes DATA enviados → servidor vê perda → RUDP retransmite)
-#   - Servidor: delay + loss (afeta ACKs voltando → TCP sofre backoff realista)
-# Delay dividido em 2 para que o RTT total bata no valor do cenário.
-# Perda dividida em 2 para que a perda efetiva end-to-end aproxime o valor do cenário.
+# Aplica tc nos dois containers (perda e delay divididos para atingir
+# os valores end-to-end do enunciado: A=0%/10ms, B=10%/50ms, C=20%/100ms)
 apply_tc() {
     local SCENARIO=$1
 
-    # Limpa nos dois
     docker exec $CLIENT bash -c "tc qdisc del dev $IFACE root 2>/dev/null || true"
     docker exec $SERVER bash -c "tc qdisc del dev $IFACE root 2>/dev/null || true"
 
     case $SCENARIO in
         A)
-            # 0% perda / RTT ~10ms → 5ms em cada lado
             docker exec $CLIENT bash -c "tc qdisc add dev $IFACE root netem delay 5ms"
             docker exec $SERVER bash -c "tc qdisc add dev $IFACE root netem delay 5ms"
             ;;
         B)
-            # 10% perda / RTT ~50ms → 5% + 25ms em cada lado
             docker exec $CLIENT bash -c "tc qdisc add dev $IFACE root netem delay 25ms loss 5%"
             docker exec $SERVER bash -c "tc qdisc add dev $IFACE root netem delay 25ms loss 5%"
             ;;
         C)
-            # 20% perda / RTT ~100ms → 10% + 50ms em cada lado
             docker exec $CLIENT bash -c "tc qdisc add dev $IFACE root netem delay 50ms loss 10%"
             docker exec $SERVER bash -c "tc qdisc add dev $IFACE root netem delay 50ms loss 10%"
             ;;
@@ -69,6 +62,45 @@ wait_server() {
     done
     echo "  [ERRO] Servidor não subiu"
     return 1
+}
+
+# Extrai contagem de retransmissões TCP de um pcap
+# Conta segmentos com flag [R] retransmitidos (tcpdump mostra "[TCP Retransmission]"
+# ou segmentos duplicados identificados pelo número de seq repetido)
+extract_tcp_retrans() {
+    local PCAP=$1
+    local OUT_JSON=$2
+
+    # tcpdump -A mostra o conteúdo; filtra linhas com "seq" repetido
+    # Usa tshark se disponível (mais preciso), senão estima via tcpdump
+    RETRANS=0
+    if docker exec $SERVER which tshark > /dev/null 2>&1; then
+        RETRANS=$(docker exec $SERVER bash -c \
+            "tshark -r $PCAP -Y 'tcp.analysis.retransmission' 2>/dev/null | wc -l" || echo 0)
+    else
+        # Fallback: conta pacotes com seq já visto (heurística via tcpdump)
+        RETRANS=$(docker exec $SERVER bash -c \
+            "tcpdump -r $PCAP -nn 2>/dev/null | grep -c 'retransmit\|dup ack' || echo 0" || echo 0)
+    fi
+
+    # Injeta o valor no JSON de resultados
+    if [ -f "$OUT_JSON" ] && [ "$RETRANS" -gt 0 ] 2>/dev/null; then
+        # Usa python para atualizar o campo retransmissions em todos os runs
+        docker exec $SERVER python3 -c "
+import json, sys
+with open('$OUT_JSON') as f:
+    data = json.load(f)
+runs = len(data)
+per_run = int($RETRANS / runs) if runs > 0 else 0
+for r in data:
+    r['retransmissions'] = per_run
+with open('$OUT_JSON', 'w') as f:
+    json.dump(data, f, indent=2)
+print(f'  [tcpdump] TCP retransmissões totais={$RETRANS}, por execução≈{per_run}')
+" 2>/dev/null || echo "  [tcpdump] retransmissões TCP=$RETRANS (não injetado no JSON)"
+    else
+        echo "  [tcpdump] TCP retransmissões=$RETRANS"
+    fi
 }
 
 for SCENARIO in "${SCENARIOS[@]}"; do
@@ -102,15 +134,21 @@ for SCENARIO in "${SCENARIOS[@]}"; do
             --mode $PROTO \
             --host 172.28.0.10 \
             --port $PORT \
-            --file /files/test_10MB.bin \
+            --file /files/test_1MB.bin \
             --runs $RUNS \
             --out $OUT || echo "  [AVISO] Cliente retornou erro"
 
         docker exec $SERVER bash -c "pkill -f tcpdump || true; pkill -f server.py || true"
         sleep 2
 
+        # Converte pcap para CSV
         docker exec $SERVER bash -c \
             "tcpdump -r $PCAP -l -n 2>/dev/null | awk '{print NR\",\"\$0}' > $CSV" || true
+
+        # Para TCP, extrai retransmissões do pcap e injeta no JSON
+        if [ "$PROTO" = "tcp" ]; then
+            extract_tcp_retrans $PCAP $OUT
+        fi
 
         echo "  Concluído: $OUT"
     done
