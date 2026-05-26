@@ -21,9 +21,9 @@ FLAG_SYN     = 0x04
 FLAG_FIN     = 0x08
 
 WINDOW_SIZE  = 16
-TIMEOUT_MIN  = 0.3   
-TIMEOUT_MAX  = 1.5   
-TIMEOUT_BASE = 0.5   
+TIMEOUT_MIN  = 0.3
+TIMEOUT_MAX  = 1.5
+TIMEOUT_BASE = 0.5
 
 
 def checksum16(data: bytes) -> int:
@@ -101,6 +101,15 @@ class RUDPClient:
     def _syn(self, sock, filename, filesize):
         meta = json.dumps({"filename": filename, "filesize": filesize}).encode()
         pkt  = make_packet(0, 0, FLAG_SYN, meta)
+
+        # Drena pacotes velhos antes de enviar o SYN
+        sock.settimeout(0.0)
+        try:
+            while True:
+                sock.recvfrom(HEADER_SIZE + 512)
+        except (socket.timeout, BlockingIOError):
+            pass
+
         for attempt in range(30):
             sock.sendto(pkt, (self.host, self.port))
             sock.settimeout(3.0)
@@ -143,9 +152,8 @@ class RUDPClient:
             dup_ack_cnt = [0]
             last_ack    = [-1]
             rtt_avg     = [TIMEOUT_BASE]
-            send_times  = {}    
+            send_times  = {}
 
-            # ── Thread leitora de ACKs ────────────────────────────────────────
             def ack_reader():
                 while not done[0]:
                     try:
@@ -161,21 +169,16 @@ class RUDPClient:
                         continue
 
                     with lock:
-                        # Atualiza RTT apenas com amostras frescas (evita
-                        # medir RTT de retransmissões — ambiguidade de Karn)
                         if ack_num in send_times:
                             sample = time.perf_counter() - send_times[ack_num]
-                            # Só usa a amostra se for plausível (< TIMEOUT_MAX)
                             if sample < TIMEOUT_MAX:
                                 rtt_avg[0] = 0.75 * rtt_avg[0] + 0.25 * sample
-                                # Mantém o RTT dentro de limites saudáveis
                                 rtt_avg[0] = min(rtt_avg[0], TIMEOUT_MAX / 2)
 
                         if ack_num > last_ack[0]:
                             last_ack[0]    = ack_num
                             dup_ack_cnt[0] = 0
                             if ack_num >= base[0]:
-                                # Remove send_times confirmados
                                 for s in list(send_times.keys()):
                                     if s <= ack_num:
                                         send_times.pop(s, None)
@@ -184,12 +187,10 @@ class RUDPClient:
                         elif ack_num == last_ack[0]:
                             dup_ack_cnt[0] += 1
                             if dup_ack_cnt[0] >= 3:
-                                # Fast-retransmit
                                 log.debug(f"[R-UDP/GBN] Fast-retransmit seq={base[0]}")
                                 retrans[0]    += (next_seq[0] - base[0])
                                 next_seq[0]    = base[0]
                                 dup_ack_cnt[0] = 0
-                                # Limpa send_times da janela que vai ser retransmitida
                                 for s in list(send_times.keys()):
                                     if s >= base[0]:
                                         send_times.pop(s, None)
@@ -199,13 +200,19 @@ class RUDPClient:
 
             start          = time.perf_counter()
             last_send_time = time.perf_counter()
+            TRANSFER_TIMEOUT = 60.0  # timeout global de segurança
 
-            # ── Loop de envio principal ───────────────────────────────────────
             while True:
                 with lock:
                     b = base[0]
 
                 if b >= total:
+                    break
+
+                # Sai do loop se a transferência toda demorar demais
+                # (evita travar quando os últimos ACKs se perdem)
+                if (time.perf_counter() - start) > TRANSFER_TIMEOUT:
+                    log.warning(f"[R-UDP/GBN] Timeout global base={base[0]}/{total}, saindo")
                     break
 
                 with lock:
@@ -236,7 +243,6 @@ class RUDPClient:
                                 f"(rtt={rtt_avg[0]*1000:.0f}ms timeout={timeout*1000:.0f}ms)"
                             )
                             retrans[0]  += (next_seq[0] - base[0])
-                            # Limpa send_times da janela — timestamps estão velhos
                             for s in list(send_times.keys()):
                                 if s >= base[0]:
                                     send_times.pop(s, None)
@@ -288,7 +294,7 @@ if __name__ == "__main__":
         r = client.send_file(args.file)
         r["run"] = i + 1
         results.append(r)
-        time.sleep(0.3)
+        time.sleep(1.0)  # aguarda pacotes tardios da transferência anterior drenarem
 
     os.makedirs(os.path.dirname(args.out), exist_ok=True)
     with open(args.out, "w") as f:
