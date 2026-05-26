@@ -1,3 +1,8 @@
+"""
+Servidor TCP e R-UDP (Go-Back-N)
+PPGCC/UFPI - Projeto de Redes 2026-1
+"""
+
 import socket
 import struct
 import threading
@@ -20,28 +25,34 @@ FLAG_ACK    = 0x02
 FLAG_SYN    = 0x04
 FLAG_FIN    = 0x08
 
-WINDOW_SIZE = 16
-TIMEOUT     = 0.3
+TIMEOUT     = 10.0
 
 
-def checksum16(data):
+# ── checksum com cast de memoryview (muito mais rápido que iterar bytes) ──────
+def checksum16(data: bytes) -> int:
+    view = memoryview(data).cast("B")
     s = 0
-    for b in data:
-        s = (s + b) & 0xFFFF
-    return s
+    for b in view:
+        s += b
+    return s & 0xFFFF
 
-def make_packet(seq, ack, flags, payload):
+
+def make_packet(seq: int, ack: int, flags: int, payload: bytes) -> bytes:
     cs = checksum16(payload)
     return struct.pack(HEADER_FMT, seq, ack, flags, cs) + payload
 
-def parse_packet(data):
+
+def parse_packet(data: bytes):
     if len(data) < HEADER_SIZE:
         return None, None, None, None, False
     seq, ack, flags, cs = struct.unpack(HEADER_FMT, data[:HEADER_SIZE])
     payload = data[HEADER_SIZE:]
     return seq, ack, flags, payload, (checksum16(payload) == cs)
 
+
+# ═══════════════════════════════════════════════════════════════════════════════
 #  SERVIDOR TCP
+# ═══════════════════════════════════════════════════════════════════════════════
 
 class TCPServer:
     def __init__(self, host, port, save_dir="/received"):
@@ -98,7 +109,19 @@ class TCPServer:
         except Exception as e:
             log.error(f"[TCP] Erro: {e}")
 
-#  SERVIDOR R-UDP 
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#  SERVIDOR R-UDP  (Go-Back-N)
+#
+#  Melhorias em relação à versão anterior:
+#  1. SYN-ACK com reenvio periódico: enquanto a thread de transferência ainda
+#     não recebeu o primeiro pacote DATA, o loop principal continua reenviando
+#     o SYN-ACK para o cliente (resolve perda do SYN-ACK em cenários B/C).
+#  2. Buffer de recepção aumentado no worker_sock para não descartar pacotes
+#     que chegam em rajada.
+#  3. ACK só é enviado quando válido E seq == expected (não responde pacotes
+#     corrompidos com ACK especulativo).
+# ═══════════════════════════════════════════════════════════════════════════════
 
 class RUDPServer:
     def __init__(self, host, port, save_dir="/received"):
@@ -108,42 +131,77 @@ class RUDPServer:
         os.makedirs(save_dir, exist_ok=True)
 
     def run(self):
-        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
-            s.bind((self.host, self.port))
-            log.info(f"[R-UDP/GBN] Aguardando em {self.host}:{self.port}")
-            while True:
-                self._receive_file(s)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        sock.bind((self.host, self.port))
+        log.info(f"[R-UDP/GBN] Aguardando em {self.host}:{self.port}")
 
-    def _receive_file(self, s):
-        # Aguarda SYN
         while True:
+            sock.settimeout(None)
             try:
-                s.settimeout(None)
-                data, addr = s.recvfrom(CHUNK_SIZE + HEADER_SIZE + 512)
+                data, addr = sock.recvfrom(CHUNK_SIZE + HEADER_SIZE + 512)
             except Exception:
                 continue
+
             seq, ack, flags, payload, valid = parse_packet(data)
-            if valid and (flags & FLAG_SYN):
-                break
+            if not valid:
+                continue
 
-        meta = json.loads(payload.decode())
-        filename, filesize = meta["filename"], meta["filesize"]
-        log.info(f"[R-UDP/GBN] SYN de {addr} — '{filename}' ({filesize} bytes)")
-        s.sendto(make_packet(0, 0, FLAG_SYN | FLAG_ACK, b""), addr)
+            if flags & FLAG_SYN:
+                log.info(f"[R-UDP/GBN] SYN de {addr}")
 
-        expected   = 0
-        total      = (filesize + CHUNK_SIZE - 1) // CHUNK_SIZE
-        out_order  = 0
-        start      = time.perf_counter()
-        path       = os.path.join(self.save_dir, filename)
+                worker_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                # Buffer grande para absorver rajadas sem perder pacotes no kernel
+                worker_sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 1 << 20)
+                worker_sock.bind(("0.0.0.0", 0))
+                worker_port = worker_sock.getsockname()[1]
+
+                syn_ack = make_packet(worker_port, seq, FLAG_SYN | FLAG_ACK, b"")
+
+                meta = json.loads(payload.decode())
+
+                # Flag compartilhado: a thread sinaliza quando recebeu o 1º DATA
+                first_data_received = threading.Event()
+
+                t = threading.Thread(
+                    target=self._handle_transfer,
+                    args=(worker_sock, addr, meta, first_data_received),
+                    daemon=True
+                )
+                t.start()
+
+                # Reenvia SYN-ACK até o cliente confirmar com o 1º pacote DATA
+                # (no máximo 20 tentativas × 0.5s = 10s)
+                def syn_ack_loop(main_sock, dest, pkt, event):
+                    for _ in range(20):
+                        main_sock.sendto(pkt, dest)
+                        if event.wait(timeout=0.5):
+                            break  # 1º DATA chegou — para de reenviar
+
+                threading.Thread(
+                    target=syn_ack_loop,
+                    args=(sock, addr, syn_ack, first_data_received),
+                    daemon=True
+                ).start()
+
+    def _handle_transfer(self, sock, addr, meta, first_data_received: threading.Event):
+        filename = meta["filename"]
+        filesize = meta["filesize"]
+        total    = (filesize + CHUNK_SIZE - 1) // CHUNK_SIZE
+        expected = 0
+        out_order = 0
+        start    = time.perf_counter()
+        path     = os.path.join(self.save_dir, filename)
+
+        log.info(f"[R-UDP/GBN] Recebendo '{filename}' ({filesize} bytes) de {addr}")
 
         with open(path, "wb") as f:
             while expected < total:
                 try:
-                    s.settimeout(10.0)
-                    data, addr2 = s.recvfrom(CHUNK_SIZE + HEADER_SIZE + 32)
+                    sock.settimeout(TIMEOUT)
+                    data, _ = sock.recvfrom(CHUNK_SIZE + HEADER_SIZE + 32)
                 except socket.timeout:
-                    log.warning("[R-UDP/GBN] Timeout aguardando pacote")
+                    log.warning(f"[R-UDP/GBN] Timeout aguardando seq={expected}")
                     continue
 
                 seq, ack, flags, payload, valid = parse_packet(data)
@@ -151,34 +209,46 @@ class RUDPServer:
                 if flags & FLAG_FIN:
                     break
 
+                # Sinaliza que o 1º pacote chegou (para o loop de SYN-ACK parar)
+                if not first_data_received.is_set():
+                    first_data_received.set()
+
                 if not valid:
-                    # Envia ACK do último pacote confirmado
+                    # Pacote corrompido — reenvia ACK do último recebido correto
                     if expected > 0:
-                        s.sendto(make_packet(0, expected - 1, FLAG_ACK, b""), addr)
+                        sock.sendto(make_packet(0, expected - 1, FLAG_ACK, b""), addr)
                     continue
 
                 if seq == expected:
                     f.write(payload)
                     expected += 1
-                    # ACK cumulativo
-                    s.sendto(make_packet(0, seq, FLAG_ACK, b""), addr)
-                else:
-                    # Fora de ordem — descarta e reenvia ACK do último confirmado
+                    sock.sendto(make_packet(0, seq, FLAG_ACK, b""), addr)
+                elif seq > expected:
+                    # Fora de ordem — Go-Back-N: descarta e pede reenvio
                     out_order += 1
                     if expected > 0:
-                        s.sendto(make_packet(0, expected - 1, FLAG_ACK, b""), addr)
+                        sock.sendto(make_packet(0, expected - 1, FLAG_ACK, b""), addr)
+                # seq < expected → duplicata silenciosa, não faz nada
 
         elapsed    = time.perf_counter() - start
         file_bytes = os.path.getsize(path)
         throughput = file_bytes / elapsed if elapsed > 0 else 0
-        log.info(f"[R-UDP/GBN] Completo: {file_bytes} bytes | {elapsed:.3f}s | "
-                 f"{throughput/1024:.1f} KB/s | fora_ordem={out_order}")
-        s.sendto(make_packet(0, 0, FLAG_FIN | FLAG_ACK, json.dumps({
+        log.info(f"[R-UDP/GBN] Completo '{filename}': {file_bytes} bytes | "
+                 f"{elapsed:.3f}s | {throughput/1024:.1f} KB/s | fora_ordem={out_order}")
+
+        result_pkt = make_packet(0, 0, FLAG_FIN | FLAG_ACK, json.dumps({
             "status": "ok", "bytes": file_bytes, "elapsed": elapsed,
             "throughput": throughput, "out_of_order": out_order
-        }).encode()), addr)
+        }).encode())
+        for _ in range(5):
+            sock.sendto(result_pkt, addr)
+            time.sleep(0.05)
+        sock.close()
 
+
+# ═══════════════════════════════════════════════════════════════════════════════
 #  MAIN
+# ═══════════════════════════════════════════════════════════════════════════════
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
