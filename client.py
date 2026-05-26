@@ -21,11 +21,8 @@ FLAG_SYN    = 0x04
 FLAG_FIN    = 0x08
 
 WINDOW_SIZE = 16
-# Timeout base — o cliente ajusta dinamicamente com base no RTT medido
 TIMEOUT_BASE = 0.5
 
-
-# ── checksum com memoryview (muito mais rápido que iterar bytes) ──────────────
 def checksum16(data: bytes) -> int:
     view = memoryview(data).cast("B")
     s = 0
@@ -78,31 +75,16 @@ class TCPClient:
             elapsed = time.perf_counter() - start
             throughput = sent / elapsed if elapsed > 0 else 0
 
-            # Aguarda confirmação do servidor com timeout curto.
-            # Não bloqueia a medição — o tempo já foi registrado acima.
             try:
                 s.settimeout(5.0)
                 s.recv(512)
             except socket.timeout:
-                pass  # servidor demorou, mas a transferência já foi medida
+                pass  
 
         log.info(f"[TCP] Enviado: {sent} bytes em {elapsed:.3f}s — {throughput/1024:.1f} KB/s")
         return {"protocol": "TCP", "filename": filename, "bytes_sent": sent,
                 "elapsed": elapsed, "throughput_kbps": throughput/1024, "retransmissions": 0}
 
-
-# ═══════════════════════════════════════════════════════════════════════════════
-#  CLIENTE R-UDP  (Go-Back-N com pipeline real)
-#
-#  Melhorias em relação à versão anterior:
-#  1. Pipeline completo: thread separada drena ACKs enquanto o loop principal
-#     enche a janela → CPU nunca fica parada esperando o RTT.
-#  2. RTT adaptativo: timeout = max(2×RTT_médio, 0.3s) para evitar retransmissões
-#     desnecessárias no cenário C (100ms delay).
-#  3. Detecção de ACK duplicado: 3 ACKs iguais acionam retransmissão imediata
-#     (fast-retransmit), sem esperar timeout completo.
-#  4. SYN com retry de 3s cada (igual ao anterior, mas loop curto).
-# ═══════════════════════════════════════════════════════════════════════════════
 
 class RUDPClient:
     def __init__(self, host, port):
@@ -133,7 +115,6 @@ class RUDPClient:
         filename = os.path.basename(filepath)
         filesize = os.path.getsize(filepath)
 
-        # Lê todos os chunks de uma vez (igual à versão original)
         chunks = []
         with open(filepath, "rb") as f:
             while True:
@@ -145,7 +126,6 @@ class RUDPClient:
         log.info(f"[R-UDP/GBN] Enviando '{filename}' — {total} chunks")
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        # Buffer de recepção maior para não perder ACKs em rajada
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 1 << 20)
 
         try:
@@ -154,8 +134,8 @@ class RUDPClient:
 
             # ── Estado compartilhado entre thread de envio e thread de ACK ──
             lock        = threading.Lock()
-            base        = [0]          # próximo seq esperado pelo servidor
-            next_seq    = [0]          # próximo seq a enviar
+            base        = [0]          
+            next_seq    = [0]          
             retrans     = [0]
             done        = [False]
             dup_ack_cnt = [0]
@@ -163,7 +143,7 @@ class RUDPClient:
 
             # RTT adaptativo: mantém média móvel exponencial
             rtt_avg     = [TIMEOUT_BASE]
-            send_times  = {}           # seq → timestamp de envio
+            send_times  = {}           
 
             # ── Thread leitora de ACKs (drena o socket continuamente) ────────
             def ack_reader():
@@ -239,9 +219,6 @@ class RUDPClient:
                     b_snap  = base[0]
                     ns_snap = next_seq[0]
 
-                # Atualiza last_send_time quando enviou algo novo.
-                # Se a janela estava cheia (esperando ACKs), NÃO reseta o timer —
-                # assim o timeout dispara corretamente se os ACKs não chegarem.
                 if sent_something:
                     last_send_time = time.perf_counter()
 
