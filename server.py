@@ -104,6 +104,10 @@ class TCPServer:
             log.error(f"[TCP] Erro: {e}")
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+#  SERVIDOR R-UDP  (Go-Back-N)
+# ═══════════════════════════════════════════════════════════════════════════════
+
 class RUDPServer:
     def __init__(self, host, port, save_dir="/received"):
         self.host = host
@@ -117,6 +121,10 @@ class RUDPServer:
         sock.bind((self.host, self.port))
         log.info(f"[R-UDP/GBN] Aguardando em {self.host}:{self.port}")
 
+        # Rastreia transferências ativas por addr do cliente
+        active      = {}
+        active_lock = threading.Lock()
+
         while True:
             sock.settimeout(None)
             try:
@@ -128,102 +136,122 @@ class RUDPServer:
             if not valid:
                 continue
 
-            if flags & FLAG_SYN:
-                log.info(f"[R-UDP/GBN] SYN de {addr}")
+            if not (flags & FLAG_SYN):
+                continue
 
-                worker_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                # Buffer grande para absorver rajadas sem perder pacotes no kernel
-                worker_sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 1 << 20)
-                worker_sock.bind(("0.0.0.0", 0))
-                worker_port = worker_sock.getsockname()[1]
+            # Ignora SYN se transferência anterior do mesmo cliente ainda ativa
+            with active_lock:
+                if active.get(addr, False):
+                    log.debug(f"[R-UDP/GBN] SYN ignorado de {addr} — transferência anterior ainda ativa")
+                    continue
+                active[addr] = True
 
-                syn_ack = make_packet(worker_port, seq, FLAG_SYN | FLAG_ACK, b"")
+            log.info(f"[R-UDP/GBN] SYN de {addr}")
 
-                meta = json.loads(payload.decode())
+            worker_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            worker_sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 1 << 20)
+            worker_sock.bind(("0.0.0.0", 0))
+            worker_port = worker_sock.getsockname()[1]
 
-                # Flag compartilhado: a thread sinaliza quando recebeu o 1º DATA
-                first_data_received = threading.Event()
+            syn_ack = make_packet(worker_port, seq, FLAG_SYN | FLAG_ACK, b"")
+            meta    = json.loads(payload.decode())
 
-                t = threading.Thread(
-                    target=self._handle_transfer,
-                    args=(worker_sock, addr, meta, first_data_received),
-                    daemon=True
-                )
-                t.start()
+            first_data_received = threading.Event()
 
-                # Reenvia SYN-ACK até o cliente confirmar com o 1º pacote DATA
-                def syn_ack_loop(main_sock, dest, pkt, event):
-                    for _ in range(20):
-                        main_sock.sendto(pkt, dest)
-                        if event.wait(timeout=0.5):
-                            break  # 1º DATA chegou — para de reenviar
+            t = threading.Thread(
+                target=self._handle_transfer,
+                args=(worker_sock, addr, meta, first_data_received, active, active_lock),
+                daemon=True
+            )
+            t.start()
 
-                threading.Thread(
-                    target=syn_ack_loop,
-                    args=(sock, addr, syn_ack, first_data_received),
-                    daemon=True
-                ).start()
+            # Reenvia SYN-ACK até 1º DATA chegar (máx 20 × 0.5s = 10s)
+            def syn_ack_loop(main_sock, dest, pkt, event):
+                for _ in range(20):
+                    main_sock.sendto(pkt, dest)
+                    if event.wait(timeout=0.5):
+                        break
 
-    def _handle_transfer(self, sock, addr, meta, first_data_received: threading.Event):
-        filename = meta["filename"]
-        filesize = meta["filesize"]
-        total    = (filesize + CHUNK_SIZE - 1) // CHUNK_SIZE
-        expected = 0
+            threading.Thread(
+                target=syn_ack_loop,
+                args=(sock, addr, syn_ack, first_data_received),
+                daemon=True
+            ).start()
+
+    def _handle_transfer(self, sock, addr, meta,
+                         first_data_received: threading.Event,
+                         active: dict, active_lock: threading.Lock):
+        filename  = meta["filename"]
+        filesize  = meta["filesize"]
+        total     = (filesize + CHUNK_SIZE - 1) // CHUNK_SIZE
+        expected  = 0
         out_order = 0
-        start    = time.perf_counter()
-        path     = os.path.join(self.save_dir, filename)
+        start     = time.perf_counter()
+        path      = os.path.join(self.save_dir, filename)
 
         log.info(f"[R-UDP/GBN] Recebendo '{filename}' ({filesize} bytes) de {addr}")
 
-        with open(path, "wb") as f:
-            while expected < total:
-                try:
-                    sock.settimeout(TIMEOUT)
-                    data, _ = sock.recvfrom(CHUNK_SIZE + HEADER_SIZE + 32)
-                except socket.timeout:
-                    log.warning(f"[R-UDP/GBN] Timeout aguardando seq={expected}")
-                    continue
+        try:
+            with open(path, "wb") as f:
+                while expected < total:
+                    try:
+                        sock.settimeout(TIMEOUT)
+                        data, _ = sock.recvfrom(CHUNK_SIZE + HEADER_SIZE + 32)
+                    except socket.timeout:
+                        log.warning(f"[R-UDP/GBN] Timeout aguardando seq={expected}")
+                        continue
 
-                seq, ack, flags, payload, valid = parse_packet(data)
+                    seq, ack, flags, payload, valid = parse_packet(data)
 
-                if flags & FLAG_FIN:
-                    break
+                    if flags & FLAG_FIN:
+                        break
 
-                # Sinaliza que o 1º pacote chegou (para o loop de SYN-ACK parar)
-                if not first_data_received.is_set():
-                    first_data_received.set()
+                    # Sinaliza 1º DATA para parar loop de SYN-ACK
+                    if not first_data_received.is_set():
+                        first_data_received.set()
 
-                if not valid:
-                    # Pacote corrompido — reenvia ACK do último recebido correto
-                    if expected > 0:
-                        sock.sendto(make_packet(0, expected - 1, FLAG_ACK, b""), addr)
-                    continue
+                    if not valid:
+                        if expected > 0:
+                            sock.sendto(make_packet(0, expected - 1, FLAG_ACK, b""), addr)
+                        continue
 
-                if seq == expected:
-                    f.write(payload)
-                    expected += 1
-                    sock.sendto(make_packet(0, seq, FLAG_ACK, b""), addr)
-                elif seq > expected:
-                    # Fora de ordem — Go-Back-N: descarta e pede reenvio
-                    out_order += 1
-                    if expected > 0:
-                        sock.sendto(make_packet(0, expected - 1, FLAG_ACK, b""), addr)
-                # seq < expected → duplicata silenciosa, não faz nada
+                    if seq == expected:
+                        f.write(payload)
+                        expected += 1
+                        sock.sendto(make_packet(0, seq, FLAG_ACK, b""), addr)
+                    elif seq > expected:
+                        out_order += 1
+                        if expected > 0:
+                            sock.sendto(make_packet(0, expected - 1, FLAG_ACK, b""), addr)
+                    # seq < expected → duplicata, ignora silenciosamente
 
-        elapsed    = time.perf_counter() - start
-        file_bytes = os.path.getsize(path)
-        throughput = file_bytes / elapsed if elapsed > 0 else 0
-        log.info(f"[R-UDP/GBN] Completo '{filename}': {file_bytes} bytes | "
-                 f"{elapsed:.3f}s | {throughput/1024:.1f} KB/s | fora_ordem={out_order}")
+            elapsed    = time.perf_counter() - start
+            file_bytes = os.path.getsize(path)
+            throughput = file_bytes / elapsed if elapsed > 0 else 0
+            log.info(f"[R-UDP/GBN] Completo '{filename}': {file_bytes} bytes | "
+                     f"{elapsed:.3f}s | {throughput/1024:.1f} KB/s | fora_ordem={out_order}")
 
-        result_pkt = make_packet(0, 0, FLAG_FIN | FLAG_ACK, json.dumps({
-            "status": "ok", "bytes": file_bytes, "elapsed": elapsed,
-            "throughput": throughput, "out_of_order": out_order
-        }).encode())
-        for _ in range(5):
-            sock.sendto(result_pkt, addr)
-            time.sleep(0.05)
-        sock.close()
+            # Manda ACK do último chunk recebido antes do FIN-ACK
+            # para garantir que o cliente saia do loop de envio
+            if expected > 0:
+                for _ in range(5):
+                    sock.sendto(make_packet(0, expected - 1, FLAG_ACK, b""), addr)
+                    time.sleep(0.02)
+
+            result_pkt = make_packet(0, 0, FLAG_FIN | FLAG_ACK, json.dumps({
+                "status": "ok", "bytes": file_bytes, "elapsed": elapsed,
+                "throughput": throughput, "out_of_order": out_order
+            }).encode())
+            for _ in range(5):
+                sock.sendto(result_pkt, addr)
+                time.sleep(0.05)
+
+        finally:
+            sock.close()
+            # Libera addr para próxima transferência
+            with active_lock:
+                active.pop(addr, None)
+            log.debug(f"[R-UDP/GBN] addr {addr} liberado")
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
