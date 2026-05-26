@@ -19,15 +19,36 @@ docker exec $CLIENT bash -c "rm -rf /files && mkdir -p /files && chmod 777 /file
 docker cp $TEST_FILE $CLIENT:/files/test_10MB.bin
 echo "    Cópia OK"
 
+# Aplica tc nos dois containers:
+#   - Cliente: delay + loss (afeta pacotes DATA enviados → servidor vê perda → RUDP retransmite)
+#   - Servidor: delay + loss (afeta ACKs voltando → TCP sofre backoff realista)
+# Delay dividido em 2 para que o RTT total bata no valor do cenário.
+# Perda dividida em 2 para que a perda efetiva end-to-end aproxime o valor do cenário.
 apply_tc() {
     local SCENARIO=$1
+
+    # Limpa nos dois
     docker exec $CLIENT bash -c "tc qdisc del dev $IFACE root 2>/dev/null || true"
+    docker exec $SERVER bash -c "tc qdisc del dev $IFACE root 2>/dev/null || true"
+
     case $SCENARIO in
-        A) docker exec $CLIENT bash -c "tc qdisc add dev $IFACE root netem delay 10ms" ;;
-        B) docker exec $CLIENT bash -c "tc qdisc add dev $IFACE root netem delay 50ms loss 10%" ;;
-        C) docker exec $CLIENT bash -c "tc qdisc add dev $IFACE root netem delay 100ms loss 20%" ;;
+        A)
+            # 0% perda / RTT ~10ms → 5ms em cada lado
+            docker exec $CLIENT bash -c "tc qdisc add dev $IFACE root netem delay 5ms"
+            docker exec $SERVER bash -c "tc qdisc add dev $IFACE root netem delay 5ms"
+            ;;
+        B)
+            # 10% perda / RTT ~50ms → 5% + 25ms em cada lado
+            docker exec $CLIENT bash -c "tc qdisc add dev $IFACE root netem delay 25ms loss 5%"
+            docker exec $SERVER bash -c "tc qdisc add dev $IFACE root netem delay 25ms loss 5%"
+            ;;
+        C)
+            # 20% perda / RTT ~100ms → 10% + 50ms em cada lado
+            docker exec $CLIENT bash -c "tc qdisc add dev $IFACE root netem delay 50ms loss 10%"
+            docker exec $SERVER bash -c "tc qdisc add dev $IFACE root netem delay 50ms loss 10%"
+            ;;
     esac
-    echo "  [tc] Cliente — Cenário $SCENARIO aplicado"
+    echo "  [tc] Cliente + Servidor — Cenário $SCENARIO aplicado"
 }
 
 wait_server() {
@@ -95,10 +116,11 @@ for SCENARIO in "${SCENARIOS[@]}"; do
     done
 done
 
-# Remove tc do cliente
+# Remove tc dos dois containers
 docker exec $CLIENT bash -c "tc qdisc del dev $IFACE root 2>/dev/null || true"
+docker exec $SERVER bash -c "tc qdisc del dev $IFACE root 2>/dev/null || true"
 echo ""
-echo ">>> tc removido do cliente"
+echo ">>> tc removido do cliente e do servidor"
 
 echo ">>> Copiando logs para ./logs/ ..."
 docker cp $SERVER:/logs/. ./logs/ 2>/dev/null || true
