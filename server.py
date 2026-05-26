@@ -1,8 +1,3 @@
-"""
-Servidor TCP e R-UDP (Go-Back-N)
-PPGCC/UFPI - Projeto de Redes 2026-1
-"""
-
 import socket
 import struct
 import threading
@@ -28,7 +23,6 @@ FLAG_FIN    = 0x08
 TIMEOUT     = 10.0
 
 
-# ── checksum com cast de memoryview (muito mais rápido que iterar bytes) ──────
 def checksum16(data: bytes) -> int:
     view = memoryview(data).cast("B")
     s = 0
@@ -110,19 +104,6 @@ class TCPServer:
             log.error(f"[TCP] Erro: {e}")
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-#  SERVIDOR R-UDP  (Go-Back-N)
-#
-#  Melhorias em relação à versão anterior:
-#  1. SYN-ACK com reenvio periódico: enquanto a thread de transferência ainda
-#     não recebeu o primeiro pacote DATA, o loop principal continua reenviando
-#     o SYN-ACK para o cliente (resolve perda do SYN-ACK em cenários B/C).
-#  2. Buffer de recepção aumentado no worker_sock para não descartar pacotes
-#     que chegam em rajada.
-#  3. ACK só é enviado quando válido E seq == expected (não responde pacotes
-#     corrompidos com ACK especulativo).
-# ═══════════════════════════════════════════════════════════════════════════════
-
 class RUDPServer:
     def __init__(self, host, port, save_dir="/received"):
         self.host = host
@@ -171,7 +152,6 @@ class RUDPServer:
                 t.start()
 
                 # Reenvia SYN-ACK até o cliente confirmar com o 1º pacote DATA
-                # (no máximo 20 tentativas × 0.5s = 10s)
                 def syn_ack_loop(main_sock, dest, pkt, event):
                     for _ in range(20):
                         main_sock.sendto(pkt, dest)
