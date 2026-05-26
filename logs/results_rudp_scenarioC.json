@@ -1,0 +1,272 @@
+[
+  {
+    "protocol": "R-UDP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 3.9516527799996766,
+    "throughput_kbps": 259.13207890701466,
+    "retransmissions": 1804,
+    "run": 1
+  },
+  {
+    "protocol": "R-UDP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 26.56450901699918,
+    "throughput_kbps": 38.547672736760205,
+    "retransmissions": 2744,
+    "run": 2
+  },
+  {
+    "protocol": "R-UDP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 5.150553512999977,
+    "throughput_kbps": 198.81358331981755,
+    "retransmissions": 1605,
+    "run": 3
+  },
+  {
+    "protocol": "R-UDP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 22.28441035800006,
+    "throughput_kbps": 45.951406546073855,
+    "retransmissions": 2147,
+    "run": 4
+  },
+  {
+    "protocol": "R-UDP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 5.2145476850000705,
+    "throughput_kbps": 196.3736956410604,
+    "retransmissions": 1700,
+    "run": 5
+  },
+  {
+    "protocol": "R-UDP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 25.654307970000445,
+    "throughput_kbps": 39.91532343017952,
+    "retransmissions": 2629,
+    "run": 6
+  },
+  {
+    "protocol": "R-UDP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 3.916448684999523,
+    "throughput_kbps": 261.4613601148523,
+    "retransmissions": 1584,
+    "run": 7
+  },
+  {
+    "protocol": "R-UDP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 24.854071756999474,
+    "throughput_kbps": 41.200492619951426,
+    "retransmissions": 2522,
+    "run": 8
+  },
+  {
+    "protocol": "R-UDP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 4.070710865999899,
+    "throughput_kbps": 251.55311534229347,
+    "retransmissions": 1589,
+    "run": 9
+  },
+  {
+    "protocol": "R-UDP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 25.6297103400002,
+    "throughput_kbps": 39.953631407290885,
+    "retransmissions": 2475,
+    "run": 10
+  },
+  {
+    "protocol": "R-UDP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 4.943906106000213,
+    "throughput_kbps": 207.12367469058805,
+    "retransmissions": 1513,
+    "run": 11
+  },
+  {
+    "protocol": "R-UDP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 25.436647276000258,
+    "throughput_kbps": 40.25687775944256,
+    "retransmissions": 2743,
+    "run": 12
+  },
+  {
+    "protocol": "R-UDP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 4.846823318000133,
+    "throughput_kbps": 211.27240107908796,
+    "retransmissions": 1616,
+    "run": 13
+  },
+  {
+    "protocol": "R-UDP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 20.759508817000096,
+    "throughput_kbps": 49.326793279494154,
+    "retransmissions": 2343,
+    "run": 14
+  },
+  {
+    "protocol": "R-UDP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 5.8638594200001535,
+    "throughput_kbps": 174.6290159186615,
+    "retransmissions": 1901,
+    "run": 15
+  },
+  {
+    "protocol": "R-UDP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 19.190614840000308,
+    "throughput_kbps": 53.35941597168669,
+    "retransmissions": 2244,
+    "run": 16
+  },
+  {
+    "protocol": "R-UDP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 10.371290349999981,
+    "throughput_kbps": 98.7340982118008,
+    "retransmissions": 1899,
+    "run": 17
+  },
+  {
+    "protocol": "R-UDP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 15.827193916000397,
+    "throughput_kbps": 64.6987713320928,
+    "retransmissions": 2041,
+    "run": 18
+  },
+  {
+    "protocol": "R-UDP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 14.511430670999289,
+    "throughput_kbps": 70.56506165490885,
+    "retransmissions": 2037,
+    "run": 19
+  },
+  {
+    "protocol": "R-UDP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 18.730156462000195,
+    "throughput_kbps": 54.67119306117355,
+    "retransmissions": 2527,
+    "run": 20
+  },
+  {
+    "protocol": "R-UDP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 11.936335241000052,
+    "throughput_kbps": 85.78847521663668,
+    "retransmissions": 2072,
+    "run": 21
+  },
+  {
+    "protocol": "R-UDP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 18.92451418300061,
+    "throughput_kbps": 54.10971135628053,
+    "retransmissions": 2497,
+    "run": 22
+  },
+  {
+    "protocol": "R-UDP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 19.562935605999883,
+    "throughput_kbps": 52.34388236119035,
+    "retransmissions": 2442,
+    "run": 23
+  },
+  {
+    "protocol": "R-UDP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 10.034255114000189,
+    "throughput_kbps": 102.0504251054246,
+    "retransmissions": 1746,
+    "run": 24
+  },
+  {
+    "protocol": "R-UDP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 7.6712636449992715,
+    "throughput_kbps": 133.4851788945519,
+    "retransmissions": 1347,
+    "run": 25
+  },
+  {
+    "protocol": "R-UDP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 16.901110977000826,
+    "throughput_kbps": 60.58773304272528,
+    "retransmissions": 2137,
+    "run": 26
+  },
+  {
+    "protocol": "R-UDP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 10.826396553999984,
+    "throughput_kbps": 94.58364053935074,
+    "retransmissions": 1872,
+    "run": 27
+  },
+  {
+    "protocol": "R-UDP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 12.249766201999591,
+    "throughput_kbps": 83.59343216141116,
+    "retransmissions": 1768,
+    "run": 28
+  },
+  {
+    "protocol": "R-UDP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 12.676248169000246,
+    "throughput_kbps": 80.7809997365144,
+    "retransmissions": 1845,
+    "run": 29
+  },
+  {
+    "protocol": "R-UDP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 19.647935584999686,
+    "throughput_kbps": 52.117434708091054,
+    "retransmissions": 2656,
+    "run": 30
+  }
+]

@@ -1,0 +1,272 @@
+[
+  {
+    "protocol": "TCP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 0.041978893999839784,
+    "throughput_kbps": 24393.210550137606,
+    "retransmissions": 0,
+    "run": 1
+  },
+  {
+    "protocol": "TCP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 0.04156831499994951,
+    "throughput_kbps": 24634.1474269824,
+    "retransmissions": 0,
+    "run": 2
+  },
+  {
+    "protocol": "TCP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 0.04099427800019839,
+    "throughput_kbps": 24979.095862965176,
+    "retransmissions": 0,
+    "run": 3
+  },
+  {
+    "protocol": "TCP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 0.04128731799983143,
+    "throughput_kbps": 24801.804757678394,
+    "retransmissions": 0,
+    "run": 4
+  },
+  {
+    "protocol": "TCP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 0.04099953600007211,
+    "throughput_kbps": 24975.89241005554,
+    "retransmissions": 0,
+    "run": 5
+  },
+  {
+    "protocol": "TCP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 0.04108855300000869,
+    "throughput_kbps": 24921.782959837587,
+    "retransmissions": 0,
+    "run": 6
+  },
+  {
+    "protocol": "TCP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 0.04100569499996709,
+    "throughput_kbps": 24972.14106481604,
+    "retransmissions": 0,
+    "run": 7
+  },
+  {
+    "protocol": "TCP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 0.05066485899988038,
+    "throughput_kbps": 20211.247405275866,
+    "retransmissions": 0,
+    "run": 8
+  },
+  {
+    "protocol": "TCP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 0.04099045200018736,
+    "throughput_kbps": 24981.427382047885,
+    "retransmissions": 0,
+    "run": 9
+  },
+  {
+    "protocol": "TCP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 0.041341537999869615,
+    "throughput_kbps": 24769.2768470111,
+    "retransmissions": 0,
+    "run": 10
+  },
+  {
+    "protocol": "TCP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 0.05068869499973516,
+    "throughput_kbps": 20201.743209316202,
+    "retransmissions": 0,
+    "run": 11
+  },
+  {
+    "protocol": "TCP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 0.050651834000291274,
+    "throughput_kbps": 20216.44467985328,
+    "retransmissions": 0,
+    "run": 12
+  },
+  {
+    "protocol": "TCP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 0.05068627099990408,
+    "throughput_kbps": 20202.709329355435,
+    "retransmissions": 0,
+    "run": 13
+  },
+  {
+    "protocol": "TCP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 0.041588770000089426,
+    "throughput_kbps": 24622.03138005279,
+    "retransmissions": 0,
+    "run": 14
+  },
+  {
+    "protocol": "TCP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 0.05081256799985567,
+    "throughput_kbps": 20152.494556128488,
+    "retransmissions": 0,
+    "run": 15
+  },
+  {
+    "protocol": "TCP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 0.04145806599990465,
+    "throughput_kbps": 24699.656756838467,
+    "retransmissions": 0,
+    "run": 16
+  },
+  {
+    "protocol": "TCP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 0.05069868900000074,
+    "throughput_kbps": 20197.760932239984,
+    "retransmissions": 0,
+    "run": 17
+  },
+  {
+    "protocol": "TCP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 0.05087547599987374,
+    "throughput_kbps": 20127.575808873833,
+    "retransmissions": 0,
+    "run": 18
+  },
+  {
+    "protocol": "TCP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 0.04105117800008884,
+    "throughput_kbps": 24944.472969759452,
+    "retransmissions": 0,
+    "run": 19
+  },
+  {
+    "protocol": "TCP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 0.04084886800001186,
+    "throughput_kbps": 25068.014124643618,
+    "retransmissions": 0,
+    "run": 20
+  },
+  {
+    "protocol": "TCP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 0.050743720999889774,
+    "throughput_kbps": 20179.836634412844,
+    "retransmissions": 0,
+    "run": 21
+  },
+  {
+    "protocol": "TCP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 0.040945391000150266,
+    "throughput_kbps": 25008.919807268223,
+    "retransmissions": 0,
+    "run": 22
+  },
+  {
+    "protocol": "TCP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 0.04118942300010531,
+    "throughput_kbps": 24860.75126610494,
+    "retransmissions": 0,
+    "run": 23
+  },
+  {
+    "protocol": "TCP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 0.0508021769996958,
+    "throughput_kbps": 20156.61651677115,
+    "retransmissions": 0,
+    "run": 24
+  },
+  {
+    "protocol": "TCP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 0.04102347599973655,
+    "throughput_kbps": 24961.31727127599,
+    "retransmissions": 0,
+    "run": 25
+  },
+  {
+    "protocol": "TCP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 0.0508041759999287,
+    "throughput_kbps": 20155.823411080164,
+    "retransmissions": 0,
+    "run": 26
+  },
+  {
+    "protocol": "TCP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 0.04098654200015517,
+    "throughput_kbps": 24983.81053947228,
+    "retransmissions": 0,
+    "run": 27
+  },
+  {
+    "protocol": "TCP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 0.04082087999995565,
+    "throughput_kbps": 25085.20149494848,
+    "retransmissions": 0,
+    "run": 28
+  },
+  {
+    "protocol": "TCP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 0.04105412199987768,
+    "throughput_kbps": 24942.684196316535,
+    "retransmissions": 0,
+    "run": 29
+  },
+  {
+    "protocol": "TCP",
+    "filename": "test_1MB.bin",
+    "bytes_sent": 1048576,
+    "elapsed": 0.05062976199997138,
+    "throughput_kbps": 20225.25802117298,
+    "retransmissions": 0,
+    "run": 30
+  }
+]
