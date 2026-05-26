@@ -12,16 +12,19 @@ log = logging.getLogger(__name__)
 
 X_CUSTOM_AUTH = "20261006269-Vandirleya"
 
-CHUNK_SIZE  = 4096
-HEADER_FMT  = "!IIHH"
-HEADER_SIZE = struct.calcsize(HEADER_FMT)
-FLAG_DATA   = 0x01
-FLAG_ACK    = 0x02
-FLAG_SYN    = 0x04
-FLAG_FIN    = 0x08
+CHUNK_SIZE   = 4096
+HEADER_FMT   = "!IIHH"
+HEADER_SIZE  = struct.calcsize(HEADER_FMT)
+FLAG_DATA    = 0x01
+FLAG_ACK     = 0x02
+FLAG_SYN     = 0x04
+FLAG_FIN     = 0x08
 
-WINDOW_SIZE = 16
-TIMEOUT_BASE = 0.5
+WINDOW_SIZE  = 16
+TIMEOUT_MIN  = 0.3   
+TIMEOUT_MAX  = 1.5   
+TIMEOUT_BASE = 0.5   
+
 
 def checksum16(data: bytes) -> int:
     view = memoryview(data).cast("B")
@@ -72,30 +75,32 @@ class TCPClient:
                     s.sendall(chunk)
                     sent += len(chunk)
 
-            elapsed = time.perf_counter() - start
+            elapsed    = time.perf_counter() - start
             throughput = sent / elapsed if elapsed > 0 else 0
 
             try:
                 s.settimeout(5.0)
                 s.recv(512)
             except socket.timeout:
-                pass  
+                pass
 
         log.info(f"[TCP] Enviado: {sent} bytes em {elapsed:.3f}s — {throughput/1024:.1f} KB/s")
         return {"protocol": "TCP", "filename": filename, "bytes_sent": sent,
                 "elapsed": elapsed, "throughput_kbps": throughput/1024, "retransmissions": 0}
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+#  CLIENTE R-UDP  (Go-Back-N)
+# ═══════════════════════════════════════════════════════════════════════════════
+
 class RUDPClient:
     def __init__(self, host, port):
         self.host = host
         self.port = port
 
-    # ── Handshake ─────────────────────────────────────────────────────────────
     def _syn(self, sock, filename, filesize):
         meta = json.dumps({"filename": filename, "filesize": filesize}).encode()
         pkt  = make_packet(0, 0, FLAG_SYN, meta)
-
         for attempt in range(30):
             sock.sendto(pkt, (self.host, self.port))
             sock.settimeout(3.0)
@@ -103,14 +108,12 @@ class RUDPClient:
                 data, _ = sock.recvfrom(HEADER_SIZE + 256)
                 seq, ack, flags, payload, valid = parse_packet(data)
                 if valid and (flags & FLAG_SYN) and (flags & FLAG_ACK):
-                    dedicated_port = seq
-                    log.info(f"[R-UDP] SYN-ACK recebido — porta dedicada: {dedicated_port}")
-                    return dedicated_port
+                    log.info(f"[R-UDP] SYN-ACK recebido — porta dedicada: {seq}")
+                    return seq
             except socket.timeout:
                 log.warning(f"[R-UDP] SYN timeout (tentativa {attempt+1})")
         raise RuntimeError("SYN falhou após 30 tentativas")
 
-    # ── Envio principal ───────────────────────────────────────────────────────
     def send_file(self, filepath):
         filename = os.path.basename(filepath)
         filesize = os.path.getsize(filepath)
@@ -132,20 +135,17 @@ class RUDPClient:
             dedicated_port = self._syn(sock, filename, filesize)
             server_addr    = (self.host, dedicated_port)
 
-            # ── Estado compartilhado entre thread de envio e thread de ACK ──
             lock        = threading.Lock()
-            base        = [0]          
-            next_seq    = [0]          
+            base        = [0]
+            next_seq    = [0]
             retrans     = [0]
             done        = [False]
             dup_ack_cnt = [0]
             last_ack    = [-1]
-
-            # RTT adaptativo: mantém média móvel exponencial
             rtt_avg     = [TIMEOUT_BASE]
-            send_times  = {}           
+            send_times  = {}    
 
-            # ── Thread leitora de ACKs (drena o socket continuamente) ────────
+            # ── Thread leitora de ACKs ────────────────────────────────────────
             def ack_reader():
                 while not done[0]:
                     try:
@@ -161,51 +161,53 @@ class RUDPClient:
                         continue
 
                     with lock:
-                        # Atualiza RTT com base no pacote que foi ACKado
+                        # Atualiza RTT apenas com amostras frescas (evita
+                        # medir RTT de retransmissões — ambiguidade de Karn)
                         if ack_num in send_times:
-                            sample = time.perf_counter() - send_times.pop(ack_num)
-                            # EWMA com α=0.25
-                            rtt_avg[0] = 0.75 * rtt_avg[0] + 0.25 * sample
+                            sample = time.perf_counter() - send_times[ack_num]
+                            # Só usa a amostra se for plausível (< TIMEOUT_MAX)
+                            if sample < TIMEOUT_MAX:
+                                rtt_avg[0] = 0.75 * rtt_avg[0] + 0.25 * sample
+                                # Mantém o RTT dentro de limites saudáveis
+                                rtt_avg[0] = min(rtt_avg[0], TIMEOUT_MAX / 2)
 
                         if ack_num > last_ack[0]:
-                            # ACK novo — avança janela
                             last_ack[0]    = ack_num
                             dup_ack_cnt[0] = 0
                             if ack_num >= base[0]:
-                                # Limpa send_times de seq já confirmados
+                                # Remove send_times confirmados
                                 for s in list(send_times.keys()):
                                     if s <= ack_num:
                                         send_times.pop(s, None)
                                 base[0]     = ack_num + 1
                                 next_seq[0] = max(next_seq[0], base[0])
                         elif ack_num == last_ack[0]:
-                            # ACK duplicado
                             dup_ack_cnt[0] += 1
                             if dup_ack_cnt[0] >= 3:
-                                # Fast-retransmit: força o loop principal a
-                                # retransmitir a partir de base
+                                # Fast-retransmit
                                 log.debug(f"[R-UDP/GBN] Fast-retransmit seq={base[0]}")
                                 retrans[0]    += (next_seq[0] - base[0])
                                 next_seq[0]    = base[0]
                                 dup_ack_cnt[0] = 0
+                                # Limpa send_times da janela que vai ser retransmitida
+                                for s in list(send_times.keys()):
+                                    if s >= base[0]:
+                                        send_times.pop(s, None)
 
             ack_thread = threading.Thread(target=ack_reader, daemon=True)
             ack_thread.start()
 
-            start = time.perf_counter()
-
-            # ── Loop de envio principal ───────────────────────────────────────
+            start          = time.perf_counter()
             last_send_time = time.perf_counter()
 
+            # ── Loop de envio principal ───────────────────────────────────────
             while True:
                 with lock:
-                    b  = base[0]
-                    ns = next_seq[0]
+                    b = base[0]
 
                 if b >= total:
-                    break  # tudo confirmado
+                    break
 
-                # Envia pacotes que cabem na janela
                 with lock:
                     sent_something = False
                     window_full    = (next_seq[0] >= base[0] + WINDOW_SIZE)
@@ -214,7 +216,7 @@ class RUDPClient:
                         pkt = make_packet(seq_to_send, 0, FLAG_DATA, chunks[seq_to_send])
                         sock.sendto(pkt, server_addr)
                         send_times[seq_to_send] = time.perf_counter()
-                        next_seq[0] += 1
+                        next_seq[0]   += 1
                         sent_something = True
                     b_snap  = base[0]
                     ns_snap = next_seq[0]
@@ -222,36 +224,42 @@ class RUDPClient:
                 if sent_something:
                     last_send_time = time.perf_counter()
 
-                # Verifica timeout: base não avançou por 2×RTT após o último envio
-                timeout = max(2.0 * rtt_avg[0], 0.3)
-                now = time.perf_counter()
+                timeout = min(max(2.0 * rtt_avg[0], TIMEOUT_MIN), TIMEOUT_MAX)
+                now     = time.perf_counter()
+
                 if (now - last_send_time) > timeout:
                     with lock:
                         if base[0] == b_snap and next_seq[0] > base[0]:
-                            log.debug(f"[R-UDP/GBN] Timeout base={base[0]}, "
-                                      f"retransmitindo {next_seq[0]-base[0]} pkts "
-                                      f"(rtt_avg={rtt_avg[0]*1000:.0f}ms)")
+                            log.debug(
+                                f"[R-UDP/GBN] Timeout base={base[0]}, "
+                                f"retrans={next_seq[0]-base[0]} pkts "
+                                f"(rtt={rtt_avg[0]*1000:.0f}ms timeout={timeout*1000:.0f}ms)"
+                            )
                             retrans[0]  += (next_seq[0] - base[0])
-                            next_seq[0]  = base[0]
+                            # Limpa send_times da janela — timestamps estão velhos
+                            for s in list(send_times.keys()):
+                                if s >= base[0]:
+                                    send_times.pop(s, None)
+                            next_seq[0] = base[0]
                     last_send_time = time.perf_counter()
                 elif window_full:
-                    # Janela cheia mas sem timeout — aguarda ACKs sem busy-wait
                     time.sleep(0.002)
                 else:
                     time.sleep(0.001)
 
-            done[0] = True
+            done[0]    = True
             elapsed    = time.perf_counter() - start
             throughput = filesize / elapsed if elapsed > 0 else 0
 
-            # Envia FIN
             fin = make_packet(0, 0, FLAG_FIN, b"")
             for _ in range(10):
                 sock.sendto(fin, server_addr)
                 time.sleep(0.05)
 
-            log.info(f"[R-UDP/GBN] '{filename}' enviado: {filesize} bytes em {elapsed:.3f}s "
-                     f"— {throughput/1024:.1f} KB/s | retransmissões={retrans[0]}")
+            log.info(
+                f"[R-UDP/GBN] '{filename}' enviado: {filesize} bytes em {elapsed:.3f}s "
+                f"— {throughput/1024:.1f} KB/s | retransmissões={retrans[0]}"
+            )
             return {"protocol": "R-UDP", "filename": filename, "bytes_sent": filesize,
                     "elapsed": elapsed, "throughput_kbps": throughput/1024,
                     "retransmissions": retrans[0]}
