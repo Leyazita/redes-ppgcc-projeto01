@@ -12,17 +12,16 @@ X_CUSTOM_AUTH = "20261006269-Vandirleya"
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 log = logging.getLogger(__name__)
 
-CHUNK_SIZE   = 4096
-HEADER_FMT   = "!IIHH"
-HEADER_SIZE  = struct.calcsize(HEADER_FMT)
-FLAG_DATA    = 0x01
-FLAG_ACK     = 0x02
-FLAG_SYN     = 0x04
-FLAG_FIN     = 0x08
-FLAG_NACK    = 0x10
-WINDOW_SIZE  = 8
-TIMEOUT      = 2.0
-MAX_RETRIES  = 20
+CHUNK_SIZE  = 4096
+HEADER_FMT  = "!IIHH"
+HEADER_SIZE = struct.calcsize(HEADER_FMT)
+FLAG_DATA   = 0x01
+FLAG_ACK    = 0x02
+FLAG_SYN    = 0x04
+FLAG_FIN    = 0x08
+
+WINDOW_SIZE = 16
+TIMEOUT     = 0.3
 
 
 def checksum16(data):
@@ -42,6 +41,7 @@ def parse_packet(data):
     payload = data[HEADER_SIZE:]
     return seq, ack, flags, payload, (checksum16(payload) == cs)
 
+#  SERVIDOR TCP
 
 class TCPServer:
     def __init__(self, host, port, save_dir="/received"):
@@ -61,12 +61,10 @@ class TCPServer:
                 threading.Thread(target=self._handle, args=(conn, addr), daemon=True).start()
 
     def _handle(self, conn, addr):
-        log.info(f"[TCP] Conexão de {addr}")
-
-        def recv_line(connection):
+        def recv_line(c):
             line = b""
             while True:
-                b = connection.recv(1)
+                b = c.recv(1)
                 if not b or b == b"\n":
                     break
                 line += b
@@ -74,11 +72,9 @@ class TCPServer:
 
         try:
             with conn:
-                auth_raw = recv_line(conn)
-                log.info(f"[TCP] X-Custom-Auth: {auth_raw.decode(errors='replace').strip()}")
-
-                meta_raw = recv_line(conn)
-                meta = json.loads(meta_raw.decode())
+                auth = recv_line(conn).decode(errors="replace").strip()
+                log.info(f"[TCP] X-Custom-Auth: {auth}")
+                meta = json.loads(recv_line(conn).decode())
                 filename, filesize = meta["filename"], meta["filesize"]
                 log.info(f"[TCP] Recebendo '{filename}' ({filesize} bytes)")
                 conn.sendall(b"OK")
@@ -86,7 +82,6 @@ class TCPServer:
                 path = os.path.join(self.save_dir, filename)
                 received = 0
                 start = time.perf_counter()
-
                 with open(path, "wb") as f:
                     while received < filesize:
                         chunk = conn.recv(min(CHUNK_SIZE, filesize - received))
@@ -98,14 +93,12 @@ class TCPServer:
                 elapsed = time.perf_counter() - start
                 throughput = received / elapsed if elapsed > 0 else 0
                 log.info(f"[TCP] Completo: {received} bytes | {elapsed:.3f}s | {throughput/1024:.1f} KB/s")
-
-                conn.sendall(json.dumps({
-                    "status": "ok", "bytes": received,
-                    "elapsed": elapsed, "throughput": throughput
-                }).encode())
+                conn.sendall(json.dumps({"status": "ok", "bytes": received,
+                                         "elapsed": elapsed, "throughput": throughput}).encode())
         except Exception as e:
             log.error(f"[TCP] Erro: {e}")
 
+#  SERVIDOR R-UDP 
 
 class RUDPServer:
     def __init__(self, host, port, save_dir="/received"):
@@ -117,37 +110,40 @@ class RUDPServer:
     def run(self):
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
             s.bind((self.host, self.port))
-            log.info(f"[R-UDP] Aguardando em {self.host}:{self.port}")
+            log.info(f"[R-UDP/GBN] Aguardando em {self.host}:{self.port}")
             while True:
                 self._receive_file(s)
 
     def _receive_file(self, s):
+        # Aguarda SYN
         while True:
-            data, addr = s.recvfrom(CHUNK_SIZE + HEADER_SIZE + 512)
+            try:
+                s.settimeout(None)
+                data, addr = s.recvfrom(CHUNK_SIZE + HEADER_SIZE + 512)
+            except Exception:
+                continue
             seq, ack, flags, payload, valid = parse_packet(data)
             if valid and (flags & FLAG_SYN):
                 break
 
         meta = json.loads(payload.decode())
         filename, filesize = meta["filename"], meta["filesize"]
-        log.info(f"[R-UDP] SYN de {addr} — '{filename}' ({filesize} bytes)")
-        s.sendto(make_packet(0, seq, FLAG_SYN | FLAG_ACK, b""), addr)
+        log.info(f"[R-UDP/GBN] SYN de {addr} — '{filename}' ({filesize} bytes)")
+        s.sendto(make_packet(0, 0, FLAG_SYN | FLAG_ACK, b""), addr)
 
-        expected_seq = 0
-        buffer = {}
-        total_chunks = (filesize + CHUNK_SIZE - 1) // CHUNK_SIZE
-        corrupted = 0
-        out_of_order = 0
-        start = time.perf_counter()
+        expected   = 0
+        total      = (filesize + CHUNK_SIZE - 1) // CHUNK_SIZE
+        out_order  = 0
+        start      = time.perf_counter()
+        path       = os.path.join(self.save_dir, filename)
 
-        path = os.path.join(self.save_dir, filename)
         with open(path, "wb") as f:
-            while expected_seq < total_chunks:
+            while expected < total:
                 try:
-                    s.settimeout(TIMEOUT * 3)
+                    s.settimeout(10.0)
                     data, addr2 = s.recvfrom(CHUNK_SIZE + HEADER_SIZE + 32)
                 except socket.timeout:
-                    log.warning("[R-UDP] Timeout aguardando pacote")
+                    log.warning("[R-UDP/GBN] Timeout aguardando pacote")
                     continue
 
                 seq, ack, flags, payload, valid = parse_packet(data)
@@ -156,35 +152,33 @@ class RUDPServer:
                     break
 
                 if not valid:
-                    corrupted += 1
-                    s.sendto(make_packet(0, seq, FLAG_NACK, b""), addr)
+                    # Envia ACK do último pacote confirmado
+                    if expected > 0:
+                        s.sendto(make_packet(0, expected - 1, FLAG_ACK, b""), addr)
                     continue
 
-                if seq == expected_seq:
+                if seq == expected:
                     f.write(payload)
-                    expected_seq += 1
-                    while expected_seq in buffer:
-                        f.write(buffer.pop(expected_seq))
-                        expected_seq += 1
-                elif seq > expected_seq:
-                    if seq not in buffer:
-                        buffer[seq] = payload
-                        out_of_order += 1
+                    expected += 1
+                    # ACK cumulativo
+                    s.sendto(make_packet(0, seq, FLAG_ACK, b""), addr)
+                else:
+                    # Fora de ordem — descarta e reenvia ACK do último confirmado
+                    out_order += 1
+                    if expected > 0:
+                        s.sendto(make_packet(0, expected - 1, FLAG_ACK, b""), addr)
 
-                s.sendto(make_packet(0, seq, FLAG_ACK, b""), addr)
-
-        elapsed = time.perf_counter() - start
+        elapsed    = time.perf_counter() - start
         file_bytes = os.path.getsize(path)
         throughput = file_bytes / elapsed if elapsed > 0 else 0
-        log.info(
-            f"[R-UDP] Completo: {file_bytes} bytes | {elapsed:.3f}s | "
-            f"{throughput/1024:.1f} KB/s | corrompidos={corrupted} fora_ordem={out_of_order}"
-        )
+        log.info(f"[R-UDP/GBN] Completo: {file_bytes} bytes | {elapsed:.3f}s | "
+                 f"{throughput/1024:.1f} KB/s | fora_ordem={out_order}")
         s.sendto(make_packet(0, 0, FLAG_FIN | FLAG_ACK, json.dumps({
             "status": "ok", "bytes": file_bytes, "elapsed": elapsed,
-            "throughput": throughput, "corrupted": corrupted, "out_of_order": out_of_order
+            "throughput": throughput, "out_of_order": out_order
         }).encode()), addr)
 
+#  MAIN
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
