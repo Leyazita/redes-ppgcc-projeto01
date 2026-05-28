@@ -62,6 +62,7 @@ extract_tcp_retrans() {
     local PCAP=$1
     local OUT_JSON=$2
     RETRANS=0
+
     if docker exec $SERVER which tshark > /dev/null 2>&1; then
         RETRANS=$(docker exec $SERVER bash -c \
             "tshark -r $PCAP -Y 'tcp.analysis.retransmission' 2>/dev/null | wc -l" || echo 0)
@@ -69,22 +70,27 @@ extract_tcp_retrans() {
         RETRANS=$(docker exec $SERVER bash -c \
             "tcpdump -r $PCAP -nn 2>/dev/null | grep -c 'retransmit\|dup ack' || echo 0" || echo 0)
     fi
-    if [ -f "$OUT_JSON" ] && [ "$RETRANS" -gt 0 ] 2>/dev/null; then
-        docker exec $SERVER python3 -c "
-import json
-with open('$OUT_JSON') as f:
+
+    # Escreve script Python em arquivo temporário e copia para o servidor
+    # (evita problema de aspas no python3 -c)
+    cat > /tmp/inject_retrans.py << PYEOF
+import json, sys
+pcap_retrans = int(sys.argv[1])
+json_path    = sys.argv[2]
+with open(json_path) as f:
     data = json.load(f)
-runs = len(data)
-per_run = int($RETRANS / runs) if runs > 0 else 0
+runs    = len(data)
+per_run = round(pcap_retrans / runs, 2) if runs > 0 else 0
 for r in data:
     r['retransmissions'] = per_run
-with open('$OUT_JSON', 'w') as f:
+with open(json_path, 'w') as f:
     json.dump(data, f, indent=2)
-print(f'  [tcpdump] TCP retransmissões totais=$RETRANS, por execução≈{per_run}')
-" 2>/dev/null || echo "  [tcpdump] retransmissões TCP=$RETRANS (não injetado no JSON)"
-    else
-        echo "  [tcpdump] TCP retransmissões=$RETRANS"
-    fi
+print(f'  [tcpdump] TCP retransmissões totais={pcap_retrans} | por execução≈{per_run}')
+PYEOF
+
+    docker cp /tmp/inject_retrans.py $SERVER:/tmp/inject_retrans.py
+    docker exec $SERVER python3 /tmp/inject_retrans.py "$RETRANS" "$OUT_JSON" \
+        || echo "  [tcpdump] retransmissões TCP=$RETRANS (erro ao injetar no JSON)"
 }
 
 for SCENARIO in "${SCENARIOS[@]}"; do
