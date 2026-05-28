@@ -1,92 +1,92 @@
-2026-05-26 23:16:13,481 [INFO] Servidor modo=rudp
-2026-05-26 23:16:13,482 [INFO] [R-UDP/GBN] Aguardando em 0.0.0.0:5001
-2026-05-26 23:16:16,672 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 58809)
-2026-05-26 23:16:16,673 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 58809)
-2026-05-26 23:16:18,205 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 1.533s | 668.1 KB/s | fora_ordem=316
-2026-05-26 23:16:19,759 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 50948)
-2026-05-26 23:16:19,760 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 50948)
-2026-05-26 23:16:21,720 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 1.961s | 522.3 KB/s | fora_ordem=335
-2026-05-26 23:16:26,275 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 42665)
-2026-05-26 23:16:26,276 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 42665)
-2026-05-26 23:16:27,679 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 1.403s | 729.9 KB/s | fora_ordem=259
-2026-05-26 23:16:29,234 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 53115)
-2026-05-26 23:16:29,234 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 53115)
-2026-05-26 23:16:30,832 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 1.598s | 640.8 KB/s | fora_ordem=351
-2026-05-26 23:16:32,386 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 46050)
-2026-05-26 23:16:32,387 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 46050)
-2026-05-26 23:16:34,113 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 1.727s | 593.1 KB/s | fora_ordem=402
-2026-05-26 23:16:35,667 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 47491)
-2026-05-26 23:16:35,667 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 47491)
-2026-05-26 23:16:48,312 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 12.644s | 81.0 KB/s | fora_ordem=403
-2026-05-26 23:16:49,867 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 60560)
-2026-05-26 23:16:49,869 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 60560)
-2026-05-26 23:16:51,414 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 1.545s | 662.9 KB/s | fora_ordem=314
-2026-05-26 23:16:52,969 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 39768)
-2026-05-26 23:16:52,969 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 39768)
-2026-05-26 23:16:57,158 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 4.189s | 244.4 KB/s | fora_ordem=223
-2026-05-26 23:16:58,713 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 43956)
-2026-05-26 23:16:58,714 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 43956)
-2026-05-26 23:17:00,275 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 1.562s | 655.6 KB/s | fora_ordem=332
-2026-05-26 23:17:01,830 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 39158)
-2026-05-26 23:17:01,830 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 39158)
-2026-05-26 23:17:03,426 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 1.596s | 641.7 KB/s | fora_ordem=338
-2026-05-26 23:17:04,982 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 44537)
-2026-05-26 23:17:04,982 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 44537)
-2026-05-26 23:17:06,464 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 1.482s | 691.0 KB/s | fora_ordem=259
-2026-05-26 23:17:08,019 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 41073)
-2026-05-26 23:17:08,020 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 41073)
-2026-05-26 23:17:20,543 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 12.524s | 81.8 KB/s | fora_ordem=277
-2026-05-26 23:17:22,097 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 39684)
-2026-05-26 23:17:22,098 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 39684)
-2026-05-26 23:17:23,646 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 1.548s | 661.6 KB/s | fora_ordem=367
-2026-05-26 23:17:25,199 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 52540)
-2026-05-26 23:17:25,200 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 52540)
-2026-05-26 23:17:29,978 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 4.778s | 214.3 KB/s | fora_ordem=310
-2026-05-26 23:17:31,532 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 45357)
-2026-05-26 23:17:31,533 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 45357)
-2026-05-26 23:17:33,699 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 2.166s | 472.7 KB/s | fora_ordem=371
-2026-05-26 23:17:35,253 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 56104)
-2026-05-26 23:17:35,254 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 56104)
-2026-05-26 23:17:36,899 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 1.645s | 622.6 KB/s | fora_ordem=360
-2026-05-26 23:17:38,453 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 45006)
-2026-05-26 23:17:38,454 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 45006)
-2026-05-26 23:17:48,964 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 10.510s | 97.4 KB/s | fora_ordem=361
-2026-05-26 23:17:50,520 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 45362)
-2026-05-26 23:17:50,521 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 45362)
-2026-05-26 23:17:53,885 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 3.364s | 304.4 KB/s | fora_ordem=268
-2026-05-26 23:17:55,440 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 37830)
-2026-05-26 23:17:55,440 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 37830)
-2026-05-26 23:17:59,471 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 4.030s | 254.1 KB/s | fora_ordem=293
-2026-05-26 23:18:01,025 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 55692)
-2026-05-26 23:18:01,026 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 55692)
-2026-05-26 23:18:02,567 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 1.542s | 664.2 KB/s | fora_ordem=263
-2026-05-26 23:18:04,121 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 58465)
-2026-05-26 23:18:04,122 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 58465)
-2026-05-26 23:18:06,068 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 1.947s | 526.0 KB/s | fora_ordem=281
-2026-05-26 23:18:07,624 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 56901)
-2026-05-26 23:18:07,624 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 56901)
-2026-05-26 23:18:09,221 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 1.597s | 641.4 KB/s | fora_ordem=411
-2026-05-26 23:18:10,775 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 38815)
-2026-05-26 23:18:10,776 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 38815)
-2026-05-26 23:18:21,293 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 10.517s | 97.4 KB/s | fora_ordem=341
-2026-05-26 23:18:22,848 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 57967)
-2026-05-26 23:18:22,850 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 57967)
-2026-05-26 23:18:24,798 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 1.948s | 525.7 KB/s | fora_ordem=359
-2026-05-26 23:18:26,353 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 59345)
-2026-05-26 23:18:26,354 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 59345)
-2026-05-26 23:18:32,141 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 5.787s | 176.9 KB/s | fora_ordem=372
-2026-05-26 23:18:33,697 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 39667)
-2026-05-26 23:18:33,699 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 39667)
-2026-05-26 23:18:36,041 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 2.342s | 437.3 KB/s | fora_ordem=371
-2026-05-26 23:18:37,596 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 50043)
-2026-05-26 23:18:37,597 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 50043)
-2026-05-26 23:18:39,100 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 1.504s | 681.0 KB/s | fora_ordem=245
-2026-05-26 23:18:40,655 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 44960)
-2026-05-26 23:18:40,655 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 44960)
-2026-05-26 23:18:42,478 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 1.823s | 561.8 KB/s | fora_ordem=291
-2026-05-26 23:18:44,033 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 39131)
-2026-05-26 23:18:44,033 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 39131)
-2026-05-26 23:18:50,424 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 6.391s | 160.2 KB/s | fora_ordem=250
-2026-05-26 23:18:51,979 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 54134)
-2026-05-26 23:18:51,979 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 54134)
-2026-05-26 23:18:57,614 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 5.634s | 181.7 KB/s | fora_ordem=378
+2026-05-28 00:29:18,687 [INFO] Servidor modo=rudp
+2026-05-28 00:29:18,687 [INFO] [R-UDP/GBN] Aguardando em 0.0.0.0:5001
+2026-05-28 00:29:21,891 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 44535)
+2026-05-28 00:29:21,891 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 44535)
+2026-05-28 00:29:23,693 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 1.802s | 568.4 KB/s | fora_ordem=246
+2026-05-28 00:29:28,250 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 45944)
+2026-05-28 00:29:28,250 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 45944)
+2026-05-28 00:29:29,679 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 1.428s | 717.1 KB/s | fora_ordem=224
+2026-05-28 00:29:31,235 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 41197)
+2026-05-28 00:29:31,235 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 41197)
+2026-05-28 00:29:33,949 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 2.714s | 377.3 KB/s | fora_ordem=374
+2026-05-28 00:29:35,504 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 34170)
+2026-05-28 00:29:35,505 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 34170)
+2026-05-28 00:29:37,335 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 1.830s | 559.6 KB/s | fora_ordem=393
+2026-05-28 00:29:38,889 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 47058)
+2026-05-28 00:29:38,890 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 47058)
+2026-05-28 00:29:40,495 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 1.605s | 637.9 KB/s | fora_ordem=381
+2026-05-28 00:29:42,050 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 48628)
+2026-05-28 00:29:42,050 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 48628)
+2026-05-28 00:29:53,825 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 11.774s | 87.0 KB/s | fora_ordem=332
+2026-05-28 00:29:55,383 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 37044)
+2026-05-28 00:29:55,383 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 37044)
+2026-05-28 00:30:00,300 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 4.917s | 208.3 KB/s | fora_ordem=208
+2026-05-28 00:30:01,848 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 33776)
+2026-05-28 00:30:01,849 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 33776)
+2026-05-28 00:30:03,918 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 2.069s | 494.9 KB/s | fora_ordem=346
+2026-05-28 00:30:05,473 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 56279)
+2026-05-28 00:30:05,474 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 56279)
+2026-05-28 00:30:08,114 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 2.640s | 387.9 KB/s | fora_ordem=377
+2026-05-28 00:30:09,674 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 51266)
+2026-05-28 00:30:09,674 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 51266)
+2026-05-28 00:30:11,196 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 1.521s | 673.1 KB/s | fora_ordem=321
+2026-05-28 00:30:12,751 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 45842)
+2026-05-28 00:30:12,751 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 45842)
+2026-05-28 00:30:14,708 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 1.957s | 523.3 KB/s | fora_ordem=369
+2026-05-28 00:30:16,264 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 35321)
+2026-05-28 00:30:16,264 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 35321)
+2026-05-28 00:30:24,046 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 7.781s | 131.6 KB/s | fora_ordem=304
+2026-05-28 00:30:25,603 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 55526)
+2026-05-28 00:30:25,603 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 55526)
+2026-05-28 00:30:33,442 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 7.838s | 130.6 KB/s | fora_ordem=425
+2026-05-28 00:30:34,996 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 55113)
+2026-05-28 00:30:34,996 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 55113)
+2026-05-28 00:30:37,697 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 2.700s | 379.2 KB/s | fora_ordem=200
+2026-05-28 00:30:39,252 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 45847)
+2026-05-28 00:30:39,252 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 45847)
+2026-05-28 00:30:43,601 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 4.349s | 235.5 KB/s | fora_ordem=329
+2026-05-28 00:30:45,156 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 47483)
+2026-05-28 00:30:45,156 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 47483)
+2026-05-28 00:30:47,632 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 2.476s | 413.6 KB/s | fora_ordem=294
+2026-05-28 00:30:49,190 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 60385)
+2026-05-28 00:30:49,190 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 60385)
+2026-05-28 00:30:51,563 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 2.372s | 431.7 KB/s | fora_ordem=443
+2026-05-28 00:30:53,118 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 36615)
+2026-05-28 00:30:53,118 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 36615)
+2026-05-28 00:30:56,256 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 3.137s | 326.4 KB/s | fora_ordem=328
+2026-05-28 00:30:57,811 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 51740)
+2026-05-28 00:30:57,811 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 51740)
+2026-05-28 00:31:03,561 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 5.749s | 178.1 KB/s | fora_ordem=316
+2026-05-28 00:31:05,116 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 46947)
+2026-05-28 00:31:05,116 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 46947)
+2026-05-28 00:31:08,093 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 2.977s | 344.0 KB/s | fora_ordem=304
+2026-05-28 00:31:09,647 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 36005)
+2026-05-28 00:31:09,648 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 36005)
+2026-05-28 00:31:16,827 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 7.179s | 142.6 KB/s | fora_ordem=402
+2026-05-28 00:31:18,383 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 51718)
+2026-05-28 00:31:18,384 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 51718)
+2026-05-28 00:31:20,067 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 1.683s | 608.3 KB/s | fora_ordem=317
+2026-05-28 00:31:21,621 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 42506)
+2026-05-28 00:31:21,623 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 42506)
+2026-05-28 00:31:23,202 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 1.579s | 648.4 KB/s | fora_ordem=334
+2026-05-28 00:31:24,759 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 46360)
+2026-05-28 00:31:24,760 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 46360)
+2026-05-28 00:31:26,372 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 1.612s | 635.1 KB/s | fora_ordem=312
+2026-05-28 00:31:27,928 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 44489)
+2026-05-28 00:31:27,928 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 44489)
+2026-05-28 00:32:27,981 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 0 bytes | 60.052s | 0.0 KB/s | fora_ordem=792
+2026-05-28 00:32:29,486 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 58826)
+2026-05-28 00:32:29,486 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 58826)
+2026-05-28 00:32:32,932 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 3.446s | 297.2 KB/s | fora_ordem=355
+2026-05-28 00:32:34,487 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 55221)
+2026-05-28 00:32:34,487 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 55221)
+2026-05-28 00:32:36,150 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 1.663s | 615.9 KB/s | fora_ordem=310
+2026-05-28 00:32:37,709 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 59998)
+2026-05-28 00:32:37,709 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 59998)
+2026-05-28 00:32:41,278 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 3.569s | 286.9 KB/s | fora_ordem=369
+2026-05-28 00:32:42,837 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 38657)
+2026-05-28 00:32:42,837 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 38657)
+2026-05-28 00:32:44,389 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 1.551s | 660.1 KB/s | fora_ordem=280
+2026-05-28 00:32:45,945 [INFO] [R-UDP/GBN] SYN de ('172.28.0.20', 47991)
+2026-05-28 00:32:45,945 [INFO] [R-UDP/GBN] Recebendo 'test_1MB.bin' (1048576 bytes) de ('172.28.0.20', 47991)
+2026-05-28 00:32:47,617 [INFO] [R-UDP/GBN] Completo 'test_1MB.bin': 1048576 bytes | 1.672s | 612.4 KB/s | fora_ordem=346
