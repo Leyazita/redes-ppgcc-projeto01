@@ -1,0 +1,92 @@
+2026-05-28 00:32:56,866 [INFO] Servidor modo=tcp
+2026-05-28 00:32:56,866 [INFO] [TCP] Aguardando em 0.0.0.0:5000
+2026-05-28 00:33:00,395 [INFO] [TCP] X-Custom-Auth: X-Custom-Auth: 20261006269-Vandirleya
+2026-05-28 00:33:00,495 [INFO] [TCP] Recebendo 'test_1MB.bin' (1048576 bytes)
+2026-05-28 00:33:31,061 [INFO] [TCP] Completo: 1048576 bytes | 30.566s | 33.5 KB/s
+2026-05-28 00:33:32,265 [INFO] [TCP] X-Custom-Auth: X-Custom-Auth: 20261006269-Vandirleya
+2026-05-28 00:33:32,365 [INFO] [TCP] Recebendo 'test_1MB.bin' (1048576 bytes)
+2026-05-28 00:34:00,174 [INFO] [TCP] Completo: 1048576 bytes | 27.809s | 36.8 KB/s
+2026-05-28 00:34:03,436 [INFO] [TCP] X-Custom-Auth: X-Custom-Auth: 20261006269-Vandirleya
+2026-05-28 00:34:03,536 [INFO] [TCP] Recebendo 'test_1MB.bin' (1048576 bytes)
+2026-05-28 00:34:21,074 [INFO] [TCP] Completo: 1048576 bytes | 17.537s | 58.4 KB/s
+2026-05-28 00:34:22,276 [INFO] [TCP] X-Custom-Auth: X-Custom-Auth: 20261006269-Vandirleya
+2026-05-28 00:34:22,377 [INFO] [TCP] Recebendo 'test_1MB.bin' (1048576 bytes)
+2026-05-28 00:34:39,782 [INFO] [TCP] X-Custom-Auth: X-Custom-Auth: 20261006269-Vandirleya
+2026-05-28 00:34:39,882 [INFO] [TCP] Recebendo 'test_1MB.bin' (1048576 bytes)
+2026-05-28 00:34:41,942 [INFO] [TCP] Completo: 1048576 bytes | 19.565s | 52.3 KB/s
+2026-05-28 00:34:55,855 [INFO] [TCP] Completo: 1048576 bytes | 15.973s | 64.1 KB/s
+2026-05-28 00:34:57,058 [INFO] [TCP] X-Custom-Auth: X-Custom-Auth: 20261006269-Vandirleya
+2026-05-28 00:34:57,158 [INFO] [TCP] Recebendo 'test_1MB.bin' (1048576 bytes)
+2026-05-28 00:35:14,956 [INFO] [TCP] Completo: 1048576 bytes | 17.798s | 57.5 KB/s
+2026-05-28 00:35:15,500 [INFO] [TCP] X-Custom-Auth: X-Custom-Auth: 20261006269-Vandirleya
+2026-05-28 00:35:15,500 [INFO] [TCP] Recebendo 'test_1MB.bin' (1048576 bytes)
+2026-05-28 00:35:43,439 [INFO] [TCP] Completo: 1048576 bytes | 27.938s | 36.7 KB/s
+2026-05-28 00:35:44,642 [INFO] [TCP] X-Custom-Auth: X-Custom-Auth: 20261006269-Vandirleya
+2026-05-28 00:35:44,742 [INFO] [TCP] Recebendo 'test_1MB.bin' (1048576 bytes)
+2026-05-28 00:36:09,474 [INFO] [TCP] Completo: 1048576 bytes | 24.732s | 41.4 KB/s
+2026-05-28 00:36:10,677 [INFO] [TCP] X-Custom-Auth: X-Custom-Auth: 20261006269-Vandirleya
+2026-05-28 00:36:10,777 [INFO] [TCP] Recebendo 'test_1MB.bin' (1048576 bytes)
+2026-05-28 00:36:35,359 [INFO] [TCP] Completo: 1048576 bytes | 24.582s | 41.7 KB/s
+2026-05-28 00:36:36,563 [INFO] [TCP] X-Custom-Auth: X-Custom-Auth: 20261006269-Vandirleya
+2026-05-28 00:36:36,663 [INFO] [TCP] Recebendo 'test_1MB.bin' (1048576 bytes)
+2026-05-28 00:37:01,003 [INFO] [TCP] Completo: 1048576 bytes | 24.339s | 42.1 KB/s
+2026-05-28 00:37:02,796 [INFO] [TCP] X-Custom-Auth: X-Custom-Auth: 20261006269-Vandirleya
+2026-05-28 00:37:02,796 [INFO] [TCP] Recebendo 'test_1MB.bin' (1048576 bytes)
+2026-05-28 00:37:21,659 [INFO] [TCP] Completo: 1048576 bytes | 18.862s | 54.3 KB/s
+2026-05-28 00:37:22,862 [INFO] [TCP] X-Custom-Auth: X-Custom-Auth: 20261006269-Vandirleya
+2026-05-28 00:37:23,264 [INFO] [TCP] Recebendo 'test_1MB.bin' (1048576 bytes)
+2026-05-28 00:37:50,756 [INFO] [TCP] Completo: 1048576 bytes | 27.492s | 37.2 KB/s
+2026-05-28 00:37:53,004 [INFO] [TCP] X-Custom-Auth: X-Custom-Auth: 20261006269-Vandirleya
+2026-05-28 00:37:53,104 [INFO] [TCP] Recebendo 'test_1MB.bin' (1048576 bytes)
+2026-05-28 00:38:15,688 [INFO] [TCP] Completo: 1048576 bytes | 22.584s | 45.3 KB/s
+2026-05-28 00:38:16,869 [INFO] [TCP] X-Custom-Auth: X-Custom-Auth: 20261006269-Vandirleya
+2026-05-28 00:38:17,273 [INFO] [TCP] Recebendo 'test_1MB.bin' (1048576 bytes)
+2026-05-28 00:38:43,790 [INFO] [TCP] Completo: 1048576 bytes | 26.517s | 38.6 KB/s
+2026-05-28 00:38:45,996 [INFO] [TCP] X-Custom-Auth: X-Custom-Auth: 20261006269-Vandirleya
+2026-05-28 00:38:46,096 [INFO] [TCP] Recebendo 'test_1MB.bin' (1048576 bytes)
+2026-05-28 00:38:58,543 [INFO] [TCP] X-Custom-Auth: X-Custom-Auth: 20261006269-Vandirleya
+2026-05-28 00:38:58,642 [INFO] [TCP] Recebendo 'test_1MB.bin' (1048576 bytes)
+2026-05-28 00:39:04,118 [INFO] [TCP] Completo: 1048576 bytes | 18.022s | 56.8 KB/s
+2026-05-28 00:39:18,650 [INFO] [TCP] Completo: 1048576 bytes | 20.007s | 51.2 KB/s
+2026-05-28 00:39:20,292 [INFO] [TCP] X-Custom-Auth: X-Custom-Auth: 20261006269-Vandirleya
+2026-05-28 00:39:20,292 [INFO] [TCP] Recebendo 'test_1MB.bin' (1048576 bytes)
+2026-05-28 00:39:52,918 [INFO] [TCP] Completo: 1048576 bytes | 32.626s | 31.4 KB/s
+2026-05-28 00:39:54,121 [INFO] [TCP] X-Custom-Auth: X-Custom-Auth: 20261006269-Vandirleya
+2026-05-28 00:39:54,221 [INFO] [TCP] Recebendo 'test_1MB.bin' (1048576 bytes)
+2026-05-28 00:40:08,684 [INFO] [TCP] X-Custom-Auth: X-Custom-Auth: 20261006269-Vandirleya
+2026-05-28 00:40:08,784 [INFO] [TCP] Recebendo 'test_1MB.bin' (1048576 bytes)
+2026-05-28 00:40:14,912 [INFO] [TCP] Completo: 1048576 bytes | 20.691s | 49.5 KB/s
+2026-05-28 00:40:31,827 [INFO] [TCP] Completo: 1048576 bytes | 23.042s | 44.4 KB/s
+2026-05-28 00:40:33,032 [INFO] [TCP] X-Custom-Auth: X-Custom-Auth: 20261006269-Vandirleya
+2026-05-28 00:40:33,129 [INFO] [TCP] Recebendo 'test_1MB.bin' (1048576 bytes)
+2026-05-28 00:41:04,659 [INFO] [TCP] Completo: 1048576 bytes | 31.529s | 32.5 KB/s
+2026-05-28 00:41:05,861 [INFO] [TCP] X-Custom-Auth: X-Custom-Auth: 20261006269-Vandirleya
+2026-05-28 00:41:05,962 [INFO] [TCP] Recebendo 'test_1MB.bin' (1048576 bytes)
+2026-05-28 00:41:20,122 [INFO] [TCP] X-Custom-Auth: X-Custom-Auth: 20261006269-Vandirleya
+2026-05-28 00:41:20,223 [INFO] [TCP] Recebendo 'test_1MB.bin' (1048576 bytes)
+2026-05-28 00:41:23,803 [INFO] [TCP] Completo: 1048576 bytes | 17.842s | 57.4 KB/s
+2026-05-28 00:41:39,002 [INFO] [TCP] X-Custom-Auth: X-Custom-Auth: 20261006269-Vandirleya
+2026-05-28 00:41:39,102 [INFO] [TCP] Recebendo 'test_1MB.bin' (1048576 bytes)
+2026-05-28 00:41:44,279 [INFO] [TCP] Completo: 1048576 bytes | 24.056s | 42.6 KB/s
+2026-05-28 00:41:57,113 [INFO] [TCP] Completo: 1048576 bytes | 18.011s | 56.9 KB/s
+2026-05-28 00:41:57,734 [INFO] [TCP] X-Custom-Auth: X-Custom-Auth: 20261006269-Vandirleya
+2026-05-28 00:41:57,835 [INFO] [TCP] Recebendo 'test_1MB.bin' (1048576 bytes)
+2026-05-28 00:42:27,842 [INFO] [TCP] Completo: 1048576 bytes | 30.006s | 34.1 KB/s
+2026-05-28 00:42:29,293 [INFO] [TCP] X-Custom-Auth: X-Custom-Auth: 20261006269-Vandirleya
+2026-05-28 00:42:29,393 [INFO] [TCP] Recebendo 'test_1MB.bin' (1048576 bytes)
+2026-05-28 00:42:50,074 [INFO] [TCP] X-Custom-Auth: X-Custom-Auth: 20261006269-Vandirleya
+2026-05-28 00:42:50,480 [INFO] [TCP] Recebendo 'test_1MB.bin' (1048576 bytes)
+2026-05-28 00:42:57,036 [INFO] [TCP] Completo: 1048576 bytes | 27.643s | 37.0 KB/s
+2026-05-28 00:43:18,380 [INFO] [TCP] Completo: 1048576 bytes | 27.899s | 36.7 KB/s
+2026-05-28 00:43:18,428 [INFO] [TCP] X-Custom-Auth: X-Custom-Auth: 20261006269-Vandirleya
+2026-05-28 00:43:18,428 [INFO] [TCP] Recebendo 'test_1MB.bin' (1048576 bytes)
+2026-05-28 00:43:45,509 [INFO] [TCP] Completo: 1048576 bytes | 27.081s | 37.8 KB/s
+2026-05-28 00:43:47,756 [INFO] [TCP] X-Custom-Auth: X-Custom-Auth: 20261006269-Vandirleya
+2026-05-28 00:43:47,856 [INFO] [TCP] Recebendo 'test_1MB.bin' (1048576 bytes)
+2026-05-28 00:44:15,017 [INFO] [TCP] Completo: 1048576 bytes | 27.161s | 37.7 KB/s
+2026-05-28 00:44:16,219 [INFO] [TCP] X-Custom-Auth: X-Custom-Auth: 20261006269-Vandirleya
+2026-05-28 00:44:16,320 [INFO] [TCP] Recebendo 'test_1MB.bin' (1048576 bytes)
+2026-05-28 00:44:39,761 [INFO] [TCP] Completo: 1048576 bytes | 23.441s | 43.7 KB/s
+2026-05-28 00:44:40,963 [INFO] [TCP] X-Custom-Auth: X-Custom-Auth: 20261006269-Vandirleya
+2026-05-28 00:44:41,063 [INFO] [TCP] Recebendo 'test_1MB.bin' (1048576 bytes)
+2026-05-28 00:45:03,301 [INFO] [TCP] Completo: 1048576 bytes | 22.238s | 46.0 KB/s

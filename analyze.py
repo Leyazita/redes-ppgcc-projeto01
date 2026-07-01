@@ -24,7 +24,7 @@ SCENARIO_LABELS = {
 }
 SCENARIO_LABELS_FLAT = {k: v.replace("\n", " ") for k, v in SCENARIO_LABELS.items()}
 
-FILE_SIZE_MB = 1  
+FILE_SIZE_MB = 1  # tamanho do arquivo de teste
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -163,18 +163,51 @@ def plot_seaborn_throughput(df: pd.DataFrame, agg: pd.DataFrame):
 
 
 def plot_seaborn_retransmissions(df: pd.DataFrame):
-    """Retransmissões de TCP e R-UDP lado a lado por cenário."""
+    """
+    Gráfico de barras agrupadas em escala logarítmica.
+    TCP: medido via tcpdump (valor total dividido por runs).
+    R-UDP: medido na aplicação (por execução).
+    """
+    agg = df.groupby(["protocol", "scenario"])["retransmissions"].mean().reset_index()
+
     fig, axes = plt.subplots(1, 3, figsize=(16, 5), sharey=False)
+    colors = {"TCP": "#4C72B0", "R-UDP": "#DD8452"}
+
     for i, sc in enumerate(["A", "B", "C"]):
         ax = axes[i]
-        sub = df[df.scenario == sc]
-        sns.boxplot(data=sub, x="protocol", y="retransmissions", ax=ax,
-                    palette=["#4C72B0", "#DD8452"],
-                    order=["TCP", "R-UDP"])
+        sub = agg[agg.scenario == sc]
+        protos = ["TCP", "R-UDP"]
+        vals   = [sub[sub.protocol == p]["retransmissions"].values[0] for p in protos]
+        all_zero = all(v == 0 for v in vals)
+
+        if all_zero:
+            # Cenário A: escala linear, barras simbólicas
+            bars = ax.bar(protos, [1, 1], color=[colors[p] for p in protos],
+                          alpha=0.85, width=0.5)
+            for bar in bars:
+                ax.text(bar.get_x() + bar.get_width()/2, 1.1,
+                        "0", ha="center", va="bottom", fontsize=12, fontweight="bold")
+            ax.set_ylim(0, 3)
+            ax.set_yticks([])
+            ax.set_ylabel("Retransmissões" if i == 0 else "")
+        else:
+            bars = ax.bar(protos, [max(v, 0.3) for v in vals],
+                          color=[colors[p] for p in protos], alpha=0.85, width=0.5)
+            for bar, val in zip(bars, vals):
+                label = "0" if val == 0 else f"{val:.1f}"
+                ax.text(bar.get_x() + bar.get_width()/2,
+                        bar.get_height() * 1.5,
+                        label, ha="center", va="bottom", fontsize=10)
+            ax.set_yscale("log")
+            ax.set_ylim(bottom=0.1, top=max(max(v, 0.1) for v in vals) * 5)
+            ax.set_ylabel("Retransmissões (escala log)" if i == 0 else "")
+
         ax.set_title(SCENARIO_LABELS[sc], fontsize=11)
         ax.set_xlabel("Protocolo")
-        ax.set_ylabel("Retransmissões" if i == 0 else "")
-    fig.suptitle("Retransmissões — TCP vs R-UDP por Cenário", fontsize=13, y=1.02)
+
+    fig.suptitle("Retransmissões médias — TCP vs R-UDP por Cenário (escala log)\n"
+                 "(TCP: tcpdump/run | R-UDP: contagem de aplicação/run)",
+                 fontsize=12, y=1.02)
     plt.tight_layout()
     path = os.path.join(OUTPUT_DIR, "seaborn_retransmissions.png")
     plt.savefig(path, dpi=150, bbox_inches="tight")
