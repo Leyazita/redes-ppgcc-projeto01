@@ -182,8 +182,8 @@ Protocolo confiável sobre UDP implementado em espaço de usuário com:
 
 ## 🔗 Links
 
-- 📓 [Notebook Fase 2 no Google Colab](https://colab.research.google.com/drive/1LnNlTm6OhyLqyJjvYfjlDWw4uxO0lqVx?usp=sharing)
-- 📁 [Dados da Fase 1 no Google Drive](https://drive.google.com/drive/folders/1ppG7tIYzghT4Bf0KO6dh9jDP5B11143v)
+- 📓 [Notebook Fase 2 no Google Colab](https://colab.research.google.com/drive/1UEoJrTlenGWPUSu4iatlw78MVVQR11jA?usp=sharing)
+- 📁 [Dados da Fase 1 no Google Drive](https://colab.research.google.com/drive/1LnNlTm6OhyLqyJjvYfjlDWw4uxO0lqVx?usp=sharing)
 - 🐙 [Repositório GitHub](https://github.com/Leyazita/redes-ppgcc-projeto01)
 
 ---
